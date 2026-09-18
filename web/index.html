@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Laplacian Variance image sharpness analysis demo" />
+    <title>Laplacian Blur Detector</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <section class="hero" aria-labelledby="page-title">
+        <p class="eyebrow">Standalone image quality service</p>
+        <h1 id="page-title">Laplacian Blur Detector</h1>
+        <p class="subtitle">Image Sharpness Analysis with Laplacian Variance</p>
+      </section>
+      <section class="workspace" aria-label="Image analysis workspace">
+        <div class="upload-panel">
+          <label class="drop-zone" id="drop-zone" for="image-input">
+            <input id="image-input" type="file" accept="image/jpeg,image/png,.jpg,.jpeg,.png" />
+            <span class="upload-icon" aria-hidden="true">↑</span><strong>Choose an image</strong><span>or drag a JPG, JPEG, or PNG here</span>
+          </label>
+          <div class="preview-wrap" id="preview-wrap" hidden><img id="image-preview" alt="Selected image preview" /></div>
+        </div>
+        <div class="controls-panel">
+          <div class="section-heading"><p class="eyebrow">Analysis settings</p><h2>Set your decision threshold</h2></div>
+          <label class="threshold-label" for="threshold-input">Blur threshold <span id="threshold-value">100.00</span></label>
+          <input id="threshold-input" type="range" min="0" max="400" value="100" step="1" />
+          <div class="range-labels"><span>More sensitive</span><span>More tolerant</span></div>
+          <button id="analyze-button" type="button" disabled>Analyze image</button>
+          <p class="hint">A score below the threshold is classified as blurry.</p>
+        </div>
+      </section>
+      <section class="result-section" id="result-section" aria-live="polite" hidden>
+        <div class="result-heading"><div><p class="eyebrow">Analysis result</p><h2 id="result-label">Waiting for analysis</h2></div><span id="result-badge" class="result-badge">—</span></div>
+        <p id="result-message" class="result-message"></p>
+        <div class="metrics-grid">
+          <article><span>Filename</span><strong id="metric-filename">—</strong></article><article><span>Resolution</span><strong id="metric-resolution">—</strong></article><article><span>File size</span><strong id="metric-size">—</strong></article><article><span>Blur score</span><strong id="metric-score">—</strong></article><article><span>Threshold</span><strong id="metric-threshold">—</strong></article><article><span>Result</span><strong id="metric-result">—</strong></article>
+        </div>
+        <div class="score-card">
+          <div class="score-title"><span>Sharpness score</span><strong id="bar-score">—</strong></div><div class="legend"><span>BLURRY</span><span>CLEAR</span></div>
+          <div class="score-track" aria-label="Sharpness score scale"><span class="blur-range"></span><span class="clear-range"></span><i id="threshold-marker" class="threshold-marker"><b>threshold</b></i><i id="score-marker" class="score-marker"><b>score</b></i></div>
+          <div class="scale"><span>0</span><span id="scale-threshold">100</span><span>200+</span></div>
+        </div>
+      </section>
+    </main>
+    <footer>Traditional computer-vision metric · No images are stored by this demo</footer>
+    <script src="/static/app.js"></script>
+  </body>
+</html>

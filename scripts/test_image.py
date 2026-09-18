@@ -32,12 +32,15 @@ def main() -> int:
     """Load, score, and print one image's blur classification."""
     args = parse_args()
     try:
-        result = detect_blur(load_image(args.image), args.threshold)
+        image = load_image(args.image)
+        result = detect_blur(image, args.threshold)
     except (FileNotFoundError, ValueError) as error:
         print(f"Error: {error}", file=sys.stderr)
         return 1
 
     print(f"Image: {args.image.name}")
+    height, width = image.shape[:2]
+    print(f"Resolution: {width} x {height}")
     print(f"Blur score: {result['blur_score']:.2f}")
     print(f"Threshold: {result['threshold']:.2f}")
     print(f"Result: {'BLURRY' if result['is_blurry'] else 'CLEAR'}")

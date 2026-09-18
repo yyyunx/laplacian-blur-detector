@@ -66,6 +66,13 @@ def test_healthz() -> None:
     assert response.json() == {"status": "ok"}
 
 
+def test_web_demo_is_served() -> None:
+    client = TestClient(app)
+    response = client.get("/")
+    assert response.status_code == 200
+    assert "Laplacian Blur Detector" in response.text
+
+
 def test_blur_check_api() -> None:
     client = TestClient(app)
     response = client.post(
@@ -75,9 +82,24 @@ def test_blur_check_api() -> None:
     assert response.status_code == 200
     payload = response.json()
     assert payload["success"] is True
+    assert payload["filename"] == "sharp.png"
+    assert payload["width"] == 160
+    assert payload["height"] == 160
+    assert payload["file_size"] > 0
     assert payload["threshold"] == DEFAULT_BLUR_THRESHOLD
     assert isinstance(payload["blur_score"], float)
     assert isinstance(payload["is_blurry"], bool)
+
+
+def test_blur_check_api_accepts_custom_threshold() -> None:
+    client = TestClient(app)
+    response = client.post(
+        "/api/blur/check",
+        data={"threshold": "120"},
+        files={"image": ("sharp.png", encode_png(synthetic_sharp_image()), "image/png")},
+    )
+    assert response.status_code == 200
+    assert response.json()["threshold"] == 120.0
 
 
 def test_blur_check_api_rejects_invalid_upload() -> None:

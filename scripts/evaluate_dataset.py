@@ -56,12 +56,21 @@ def main() -> int:
                 "filename": image_path.relative_to(args.directory).as_posix(),
                 "width": width,
                 "height": height,
+                "file_size": image_path.stat().st_size,
                 **result,
             }
         )
 
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    fields = ["filename", "width", "height", "blur_score", "threshold", "is_blurry"]
+    fields = [
+        "filename",
+        "width",
+        "height",
+        "file_size",
+        "blur_score",
+        "threshold",
+        "is_blurry",
+    ]
     with args.output.open("w", newline="", encoding="utf-8") as csv_file:
         writer = csv.DictWriter(csv_file, fieldnames=fields)
         writer.writeheader()
