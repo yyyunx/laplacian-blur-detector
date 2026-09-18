@@ -3,6 +3,7 @@
 ![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-REST%20API-009688?logo=fastapi&logoColor=white)
 ![OpenCV](https://img.shields.io/badge/OpenCV-Laplacian%20Variance-5C3EE8?logo=opencv&logoColor=white)
+![Tests](https://github.com/yyyunx/laplacian-blur-detector/actions/workflows/tests.yml/badge.svg)
 ![License](https://img.shields.io/badge/License-MIT-72D3B2)
 
 A lightweight standalone image-sharpness service built with OpenCV and FastAPI. Upload a photo, receive a Laplacian variance score, and classify it as **CLEAR** or **BLURRY**. It is designed to run independently today and integrate into a future iRent upload pipeline without coupling to iRent code.
