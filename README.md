@@ -1,19 +1,42 @@
 # Laplacian Blur Detector
 
-A standalone Laplacian Blur Detection Service for checking vehicle-upload photos before they enter the future iRent flow. This repository is intentionally independent: it does not modify or import any iRent code.
+![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-REST%20API-009688?logo=fastapi&logoColor=white)
+![OpenCV](https://img.shields.io/badge/OpenCV-Laplacian%20Variance-5C3EE8?logo=opencv&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-72D3B2)
 
-## Purpose
+A lightweight standalone image-sharpness service built with OpenCV and FastAPI. Upload a photo, receive a Laplacian variance score, and classify it as **CLEAR** or **BLURRY**. It is designed to run independently today and integrate into a future iRent upload pipeline without coupling to iRent code.
 
-The service measures whether an uploaded photo is likely too blurry to be useful. It provides a reusable Python core, a small command-line tool for calibration, and a FastAPI endpoint for later integration.
+## Overview
 
-## Algorithm
+This repository provides three useful interfaces:
+
+- An interactive browser demo at `/`.
+- A REST API for backend integration.
+- Reusable Python functions, a CLI, and dataset-evaluation tool.
+
+No images are stored, no database is used, and no machine-learning model is involved.
+
+## Features
+
+- Laplacian Variance Blur Detection
+- Interactive Web Demo
+- REST API
+- Adjustable Blur Threshold
+- Batch Dataset Evaluation
+- CSV Export
+- CLI
+- Automated Tests
+- Docker Support
+
+## How It Works
 
 ```text
 Image
   ↓
 Grayscale
   ↓
-Laplacian Edge Detection
+Laplacian Operator
   ↓
 Variance
   ↓
@@ -21,17 +44,24 @@ Blur Score
   ↓
 Threshold Comparison
   ↓
-Clear / Blurry
+CLEAR / BLURRY
 ```
 
-The calculation is:
+The detector computes `cv2.Laplacian(gray, cv2.CV_64F).var()`. Higher variance generally means more edge information and a sharper image. Lower variance generally means fewer or smoother edges and a blurrier image. This is a traditional computer-vision sharpness metric, not an AI or learned model.
 
-```python
-gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-score = cv2.Laplacian(gray, cv2.CV_64F).var()
+## Architecture
+
+```text
+                 Web UI
+                    ↓
+                  API
+                    ↓
+             Blur Detector Core
+                    ↑
+               CLI / Dataset Tool
 ```
 
-Laplacian is sensitive to edges and other high-frequency detail. Clear photos usually retain more distinct edges, yielding higher variance; blur smooths those edges, generally yielding lower variance. An image is blurry only when `blur_score < threshold`; an equal score is clear.
+`src/blur_detector.py` has no dependency on FastAPI, HTML, iRent, or a database. Use `calculate_blur_score(image)` for the metric, or `detect_blur(image, threshold)` for the classification.
 
 ## Installation
 
@@ -39,90 +69,128 @@ Laplacian is sensitive to edges and other high-frequency detail. Clear photos us
 python -m venv .venv
 ```
 
-Windows activation:
+Windows:
 
 ```powershell
 .venv\Scripts\activate
-```
-
-Install dependencies:
-
-```bash
 pip install -r requirements.txt
 ```
 
-## CLI usage
+macOS/Linux:
 
-Score one JPG, JPEG, or PNG image:
+```bash
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+## Quick Start
+
+```bash
+uvicorn api.main:app --host 0.0.0.0 --port 8000
+```
+
+When running, open:
+
+- Web demo: <http://localhost:8000>
+- Interactive API documentation: <http://localhost:8000/docs>
+- Health check: <http://localhost:8000/healthz>
+
+## Web Demo
+
+The browser demo accepts JPG, JPEG, and PNG files. It previews a selected image locally, lets you choose a threshold, and calls the API only when you choose **Analyze image**. It displays filename, resolution, file size, score, threshold, a prominent CLEAR/BLURRY result, and a score bar that remains valid for unusually high scores.
+
+## REST API
+
+### `GET /healthz`
+
+```json
+{"status": "ok"}
+```
+
+### `POST /api/blur/check`
+
+Accepts `multipart/form-data` fields `image` (JPG/JPEG/PNG) and optional `threshold`.
+
+```bash
+curl -X POST http://localhost:8000/api/blur/check \
+  -F "image=@path/to/car.jpg" \
+  -F "threshold=120"
+```
+
+Example response:
+
+```json
+{
+  "success": true,
+  "filename": "car.jpg",
+  "width": 1280,
+  "height": 720,
+  "file_size": 862208,
+  "blur_score": 184.72,
+  "threshold": 100.0,
+  "is_blurry": false,
+  "message": "Image quality is acceptable."
+}
+```
+
+Swagger UI is available at <http://localhost:8000/docs>.
+
+## CLI
 
 ```bash
 python scripts/test_image.py path/to/image.jpg
 python scripts/test_image.py path/to/image.jpg --threshold 120
 ```
 
-Evaluate a directory recursively and write `outputs/blur_scores.csv`:
+The output includes image name, resolution, score, threshold, and classification.
+
+## Dataset Evaluation
 
 ```bash
 python scripts/evaluate_dataset.py ./samples
-python scripts/evaluate_dataset.py ./samples --threshold 120
 ```
 
-The CSV includes each relative filename, image width and height, score, threshold, and blurry classification. Unreadable supported files are skipped and reported; source images are never altered.
+This writes `outputs/blur_scores.csv` containing `filename`, `width`, `height`, `file_size`, `blur_score`, `threshold`, and `is_blurry`. Unreadable files are reported and skipped; source images are never modified.
 
-## API usage
-
-Start the service from the repository root:
+## Docker
 
 ```bash
-uvicorn api.main:app --host 0.0.0.0 --port 8000
+docker build -t laplacian-blur-detector .
+docker run --rm -p 8000:8000 laplacian-blur-detector
 ```
 
-Health check:
+Then visit <http://localhost:8000>, <http://localhost:8000/docs>, or <http://localhost:8000/healthz>.
+
+## Threshold Calibration
+
+`DEFAULT_BLUR_THRESHOLD = 100.0` is a development default, not a universal quality rule. Calibrate a production threshold using representative photos for the actual camera, image resolution, compression, lighting, vehicle photo distance, and real iRent dataset. Inspect the generated CSV distribution before choosing a rejection threshold.
+
+## Testing
 
 ```bash
-curl http://127.0.0.1:8000/healthz
+python -m pytest -q
 ```
 
-Check an image:
+Tests generate synthetic sharp and blurred images locally. They cover the core calculation, the threshold boundary, invalid input, `/`, `/healthz`, and `POST /api/blur/check` including a custom threshold.
 
-```bash
-curl -X POST http://127.0.0.1:8000/api/blur/check -F "image=@path/to/image.jpg"
-```
+## Future iRent Integration
 
-For a blurry image, the response includes `"message": "Image is too blurry. Please retake the photo."`; otherwise it reports that quality is acceptable. Invalid, empty, non-image, or unsupported uploads return HTTP 400 with a clear error.
-
-## Threshold calibration
-
-`DEFAULT_BLUR_THRESHOLD` is **100.0**. This is only a starting threshold; it is not suitable for every camera, resolution, or scene. Calibrate it later using real iRent photos and the generated score distribution before treating it as a production decision boundary.
-
-## Future iRent integration
-
-Keep this project as the photo-quality boundary. A future iRent upload flow should correct EXIF orientation before calling the detector, then reject a blurry image before storage:
+Keep this service behind the iRent backend rather than calling it directly from an iRent frontend:
 
 ```text
-iRent photo upload
-        ↓
-EXIF orientation correction
-        ↓
-Laplacian blur check
-        ↓
-Too blurry?
-   ├─ Yes → reject + ask user to retake
-   └─ No  → continue upload
+iRent Frontend
+      ↓
+iRent Backend
+      ↓
+Blur Detection Service
+      ↓
+CLEAR?
+   ├─ No → Request Retake
+   └─ Yes → Continue iRent Upload Pipeline
 ```
 
-iRent can either import the independent core:
+At upload time, the iRent backend should correct EXIF orientation first, then call `POST /api/blur/check` before persistent storage. A blurry result should ask the user to retake the photo; a clear one can proceed. The core can also be imported directly, but the API boundary keeps future deployment and replacement independent.
 
-```python
-from src.blur_detector import detect_blur
-```
+## Limitations
 
-or invoke `POST /api/blur/check`. In either case, integrate at the server-side photo-upload validation layer, before persistent storage; do not put this decision in a frontend-only check.
-
-## Tests
-
-```bash
-pytest
-```
-
-Tests generate synthetic sharp and blurred images locally, so no test-image download is required.
+Laplacian variance measures edge detail, not every kind of image quality. A dark, low-contrast, highly compressed, naturally low-detail, or motion-blurred scene can need separate product rules. Use it as a fast quality gate together with calibration on real-world photos.
