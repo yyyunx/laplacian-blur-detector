@@ -194,3 +194,29 @@ At upload time, the iRent backend should correct EXIF orientation first, then ca
 ## Limitations
 
 Laplacian variance measures edge detail, not every kind of image quality. A dark, low-contrast, highly compressed, naturally low-detail, or motion-blurred scene can need separate product rules. Use it as a fast quality gate together with calibration on real-world photos.
+
+## Third-Party Software
+
+This project uses open-source third-party software. Each dependency remains subject to its own license terms.
+
+| Dependency             | Purpose                                             | License              |
+| ---------------------- | --------------------------------------------------- | -------------------- |
+| OpenCV / opencv-python | Image processing and Laplacian variance calculation | Apache License 2.0   |
+| FastAPI                | REST API framework                                  | MIT License          |
+| NumPy                  | Numerical and image-array operations                | BSD 3-Clause License |
+| Uvicorn                | ASGI server for running the FastAPI application     | BSD 3-Clause License |
+| python-multipart       | Multipart image upload parsing                      | Apache License 2.0   |
+| HTTPX                  | HTTP client used for API testing                    | BSD 3-Clause License |
+| pytest                 | Automated testing                                   | MIT License          |
+
+OpenCV is accessed through the `opencv-python` package. OpenCV itself is distributed under the Apache License 2.0. The `opencv-python` packaging repository contains MIT-licensed packaging scripts, while the distributed OpenCV binaries remain subject to OpenCV and bundled third-party license terms.
+
+The `opencv-python` binary wheels may contain additional third-party components with their own licenses. For example, official wheels include FFmpeg, and some non-headless Linux builds also include Qt. Refer to the upstream `opencv-python` third-party license notices for the complete list when redistributing packaged binaries or Docker images.
+
+Third-party software is not relicensed under this project's MIT License. Each dependency retains its original license and copyright.
+
+## License
+
+The original source code in this repository is licensed under the MIT License. See the `LICENSE` file for details.
+
+Third-party libraries and dependencies used by this project retain their original licenses and copyrights.
