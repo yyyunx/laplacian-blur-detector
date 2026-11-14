@@ -1,7 +1,1 @@
-opencv-python
-numpy
-fastapi
-uvicorn
-python-multipart
-pytest
-httpx
+.[server,dev]

@@ -1,0 +1,73 @@
+# Contributing
+
+Contributions to general-purpose image quality evaluation are welcome. Vehicle
+photos are one example; document capture, product photography, and other domains
+should be able to reuse the same core without importing product-specific rules.
+
+## Development setup
+
+Use Python 3.10 or newer and a virtual environment:
+
+```bash
+python -m venv .venv
+# Activate .venv using your shell's activation command.
+python -m pip install -e ".[server,dev]"
+python -m ruff check .
+python -m pytest -q
+```
+
+Run `laplacian-blur-serve` for the browser demo and `/docs` API documentation.
+Changes to the root `web/` directory appear in the editable checkout. The package
+build bundles those same assets for installations outside the checkout.
+
+## Pick a contribution
+
+- Reproduce a bug and add a focused regression test.
+- Improve usage instructions or add a domain example with clear limitations.
+- Propose a quality metric with a written contract and evaluation evidence.
+- Help define dataset labels, disagreement handling, and calibration reports.
+
+For substantial features, open a feature proposal with the user problem and
+acceptance criteria before introducing new services or dependencies. Consult
+[the roadmap](docs/ROADMAP.md) and [architecture](docs/ARCHITECTURE.md).
+
+## Submit a change
+
+1. Fork the repository and create a descriptive branch.
+2. Keep the pull request focused. Explain the resulting behavior and compatibility.
+3. Run lint and the tests relevant to your changes. Add tests for new behavior
+   where they demonstrate a meaningful regression or contract.
+4. Update documentation and the Unreleased section of `CHANGELOG.md` when behavior changes.
+5. Open a pull request using the template and respond to review feedback.
+
+Maintainer review determines whether a change is merged. CI runs on pull requests;
+branch protection and required approvals must be configured separately on GitHub.
+Do not assume a committed workflow has enabled those repository settings.
+
+## Detector and dataset changes
+
+- Keep the core independent of HTTP, storage, user accounts, and image domains.
+- Treat a score as a measurement, not a probability or a universal quality label.
+- Record preprocessing, threshold, metric version, and dataset provenance when
+  comparing results. Changes to preprocessing require threshold reevaluation.
+- Report both false rejections and missed unusable images. Separate calibration
+  and test data, including near-duplicate captures from the same session.
+- Use generated fixtures for unit tests. Share real images only with permission;
+  redact faces, identifiers, license plates, and other sensitive information.
+- Do not silently change the meaning of existing API fields or score scales.
+
+## Community expectations
+
+Be respectful, explain disagreements with evidence, and credit others' work.
+Harassment and publication of another person's private information are not accepted.
+Use [the security policy](SECURITY.md) for vulnerability reports.
+
+## Release checklist
+
+1. Update `laplacian_blur_detector/__init__.py` and the changelog together.
+2. Run `python -m ruff check .`, `python -m pytest -q`, and `python -m build`.
+3. Install the built wheel in a clean environment with server dependencies, then
+   run `tests/smoke_installed.py` from outside the checkout.
+4. Verify the CI matrix, documented compatibility, and third-party notices.
+5. Have a maintainer create the release. No workflow currently publishes to PyPI
+   or deploys a hosted service automatically.

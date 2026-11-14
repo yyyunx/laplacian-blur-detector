@@ -1,0 +1,59 @@
+[build-system]
+requires = ["hatchling>=1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "laplacian-blur-detector"
+dynamic = ["version"]
+description = "Reusable image-sharpness library, CLI, and optional HTTP service."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE", "THIRD_PARTY_NOTICES.md"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Programming Language :: Python :: 3",
+  "Topic :: Scientific/Engineering :: Image Processing",
+]
+dependencies = ["numpy>=1.24", "opencv-python>=4.8"]
+
+[project.optional-dependencies]
+server = ["fastapi>=0.115", "uvicorn>=0.30", "python-multipart>=0.0.18"]
+dev = ["pytest>=8", "httpx>=0.27", "ruff>=0.9", "build>=1.2"]
+
+[project.scripts]
+laplacian-blur = "laplacian_blur_detector.cli:main"
+laplacian-blur-evaluate = "laplacian_blur_detector.evaluate:main"
+laplacian-blur-serve = "laplacian_blur_detector.server:main"
+
+[project.urls]
+Repository = "https://github.com/yyyunx/laplacian-blur-detector"
+Issues = "https://github.com/yyyunx/laplacian-blur-detector/issues"
+
+[tool.hatch.version]
+path = "laplacian_blur_detector/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["laplacian_blur_detector"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"web/index.html" = "laplacian_blur_detector/web/index.html"
+"web/app.js" = "laplacian_blur_detector/web/app.js"
+"web/styles.css" = "laplacian_blur_detector/web/styles.css"
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "/laplacian_blur_detector", "/web", "/api", "/src", "/scripts", "/tests",
+  "/docs", "/.github", "/*.md", "/LICENSE", "/pyproject.toml",
+  "/requirements.txt", "/Dockerfile", "/.dockerignore", "/.gitignore",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py310"
+extend-exclude = [".pytest_tmp", "build", "dist"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]

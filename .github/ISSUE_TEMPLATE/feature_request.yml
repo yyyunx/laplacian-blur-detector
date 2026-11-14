@@ -1,0 +1,22 @@
+name: Feature proposal
+description: Propose a reusable capability or collaboration workflow.
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: User and problem
+      description: Who needs this, and what task is difficult today? Describe the image domain if relevant.
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Proposed behavior and acceptance criteria
+      description: Give an example input, expected outcome, and how we could verify it. Include alternatives if useful.
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Compatibility and data impact
+      description: Does this change the API, thresholds, dependencies, image storage, or permissions?

@@ -61,6 +61,15 @@ Depending on the package and platform, these components may include software suc
 * License: MIT License
 * Project: https://github.com/pytest-dev/pytest
 
+## Development and build tooling
+
+These tools are used for contribution checks and package builds; they are not
+required by the image analysis runtime.
+
+* build: MIT License — https://github.com/pypa/build
+* Hatchling: MIT License — https://github.com/pypa/hatch
+* Ruff: MIT License — https://github.com/astral-sh/ruff
+
 ---
 
 The licenses and copyrights of all third-party software remain with their respective authors and copyright holders.

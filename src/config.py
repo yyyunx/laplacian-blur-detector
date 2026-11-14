@@ -1,3 +1,7 @@
-"""Project-wide defaults."""
+"""Compatibility imports; new integrations should use laplacian_blur_detector.config."""
 
-DEFAULT_BLUR_THRESHOLD = 100.0
+from laplacian_blur_detector.config import (
+    DEFAULT_BLUR_THRESHOLD,
+)
+
+__all__ = ['DEFAULT_BLUR_THRESHOLD']

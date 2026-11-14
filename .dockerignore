@@ -6,4 +6,7 @@ __pycache__
 tests
 samples
 outputs
-README.md
+dist
+build
+.pytest_tmp
+.ruff_cache
