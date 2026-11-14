@@ -1,20 +1,22 @@
 # Roadmap: reusable engine to team collaboration
 
 This is a sequence of milestones with acceptance criteria, not a release-date promise.
-Only the open-source foundation is part of the current change.
+The open-source foundation and local labeled evaluation are implemented. The shared
+team workspace remains future work.
 
-## 1. Open-source foundation — implemented locally
+## 1. Open-source foundation — implemented
 
 - Install a library, CLI, or optional API from the same project metadata.
 - Preserve existing score behavior and checkout entry points.
 - Define contribution, bug report, feature proposal, and review workflows.
 - Run lint, regression tests, packaging, and installed-wheel checks in CI.
 
-Remaining maintainer operations: push and observe GitHub CI, configure branch
-protection/review requirements, enable private security reporting, and decide when
-to tag or publish the first packaged release. These are not enabled by local files.
+The foundation was pushed and its GitHub CI passed. Remaining maintainer operations:
+configure branch protection/review requirements, enable private security reporting,
+and decide when to tag or publish the first packaged release. These settings are
+not enabled by local files.
 
-## 2. Reproducible quality evaluation — next milestone
+## 2. Reproducible quality evaluation — local tooling implemented
 
 User outcome: a contributor can prove that a change improves a particular use case.
 
@@ -28,6 +30,11 @@ User outcome: a contributor can prove that a change improves a particular use ca
 
 Done when another contributor can reproduce an evaluation from a documented
 dataset manifest and configuration. Synthetic images alone do not establish accuracy.
+
+The CLI, manifest contract, calibration/test isolation checks, per-domain policies,
+fingerprinted reports, and a synthetic document/product example are now implemented.
+See [the guide](BENCHMARKING.md). Representative real datasets and human-reviewed
+labels still need to be supplied; real-world accuracy has not been established.
 
 ## 3. Shared review workspace — first team MVP
 

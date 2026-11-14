@@ -24,6 +24,7 @@ dev = ["pytest>=8", "httpx>=0.27", "ruff>=0.9", "build>=1.2"]
 [project.scripts]
 laplacian-blur = "laplacian_blur_detector.cli:main"
 laplacian-blur-evaluate = "laplacian_blur_detector.evaluate:main"
+laplacian-blur-benchmark = "laplacian_blur_detector.benchmark:main"
 laplacian-blur-serve = "laplacian_blur_detector.server:main"
 
 [project.urls]
@@ -44,7 +45,7 @@ packages = ["laplacian_blur_detector"]
 [tool.hatch.build.targets.sdist]
 include = [
   "/laplacian_blur_detector", "/web", "/api", "/src", "/scripts", "/tests",
-  "/docs", "/.github", "/*.md", "/LICENSE", "/pyproject.toml",
+  "/docs", "/examples", "/.github", "/*.md", "/LICENSE", "/pyproject.toml",
   "/requirements.txt", "/Dockerfile", "/.dockerignore", "/.gitignore",
 ]
 

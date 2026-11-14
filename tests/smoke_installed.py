@@ -46,6 +46,13 @@ def main() -> None:
         with output.open(newline="", encoding="utf-8") as stream:
             assert len(list(csv.DictReader(stream))) == 1
         run_command("laplacian-blur-serve", "--help")
+        manifest = root / "labels.csv"
+        manifest.write_text(
+            "filename,label,split,group,domain\nsample.png,retake,test,smoke,photos\n",
+            encoding="utf-8",
+        )
+        run_command("laplacian-blur-benchmark", str(manifest), "--output", str(root / "benchmark"))
+        assert (root / "benchmark" / "summary.json").is_file()
         with TestClient(app) as client:
             assert client.get("/healthz").json() == {"status": "ok"}
             assert "Laplacian Blur Detector" in client.get("/").text

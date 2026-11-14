@@ -6,6 +6,7 @@
 Python caller ---------> laplacian_blur_detector.blur_detector
 CLI -------------------> image_utils + blur_detector
 Dataset evaluator -----> image_utils + blur_detector ---> local CSV
+Labeled benchmark -----> manifest + evaluation ---------> policy + held-out reports
 Browser demo ----------> FastAPI ----------------------> image_utils + blur_detector
 ```
 
@@ -22,6 +23,13 @@ is one implementation of the algorithm.
 The current service is stateless. It has no shared workspace, database, identity
 provider, annotation queue, or stored image history. Scores are Laplacian variance,
 not calibrated confidence values. The default threshold is a development default.
+
+`evaluation.py` provides image-independent confusion metrics and threshold
+calibration. `benchmark.py` validates a labeled manifest, scores the exact bytes
+whose hashes are recorded, calibrates a separate threshold for each domain, and
+exports a frozen policy plus per-split reports. Test samples do not participate in
+threshold selection. Existing reports are not overwritten. The HTTP API remains
+a stateless single-threshold service; policy loading is currently CLI-only.
 
 ## Boundaries for future work
 

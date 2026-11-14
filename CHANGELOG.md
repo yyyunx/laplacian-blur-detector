@@ -2,6 +2,12 @@
 
 ## Unreleased — 0.3.0
 
+- Add labeled dataset benchmarking with independent calibration/test splits,
+  per-domain threshold selection, configurable class-error weights, frozen quality
+  policies, held-out confusion metrics, and CSV error lists.
+- Record metric/preprocessing versions, runtime versions, and dataset/policy hashes;
+  reject overlapping capture groups, duplicate bytes, and reused calibration data.
+- Preserve previous reports and add a runnable synthetic document/product example.
 - Reposition the project as a domain-independent image quality foundation.
 - Add the installable `laplacian_blur_detector` package and optional server dependencies.
 - Add `laplacian-blur`, `laplacian-blur-evaluate`, and `laplacian-blur-serve` commands.

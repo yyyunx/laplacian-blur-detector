@@ -18,6 +18,7 @@ shared datasets, annotation, and review queues are planned, not implemented.
 | Python library | Integrating measurements into your own application |
 | Single-image CLI | Checking an image locally |
 | Dataset CLI with CSV | Inspecting score distributions across a folder |
+| Labeled benchmark CLI | Calibrating domain policies and reporting held-out mistakes |
 | Optional API and browser demo | Trying uploads and connecting another backend |
 
 No images are persisted by the API. The browser previews selected images locally
@@ -98,6 +99,25 @@ python scripts/test_image.py sample.jpg --threshold 120
 python scripts/evaluate_dataset.py ./samples
 ```
 
+## Labeled evaluation and calibration
+
+Label a dataset with `filename,label,split,group,domain` (optional `reason`), then run:
+
+```bash
+laplacian-blur-benchmark data/labels.csv --calibrate --output outputs/experiment-01
+laplacian-blur-benchmark data/new-labels.csv --policy outputs/experiment-01/policy.json --output outputs/experiment-02
+```
+
+Thresholds are selected per domain using calibration samples only. Held-out test
+reports include false rejections, missed retakes, confusion counts, and an error
+list. Reports preserve policy, preprocessing, dataset fingerprints, and runtime
+versions, and refuse to overwrite previous runs. Capture-group and duplicate-image
+checks help catch calibration/test overlap.
+
+See [the benchmarking guide](docs/BENCHMARKING.md) for the CSV format, objective,
+limitations, and a runnable synthetic document/product dataset example. Human
+labels and real representative data are needed to assess accuracy.
+
 ## Browser demo and API
 
 Install the `server` extra, then run:
@@ -174,8 +194,8 @@ have templates, and pull requests should explain resulting behavior and validati
 - [Changelog](CHANGELOG.md): behavior and compatibility changes.
 - [Security policy](SECURITY.md): reporting and deployment boundaries.
 
-The next milestone is reproducible evaluation with labeled datasets and versioned
-quality policies. The first team platform milestone adds projects, permissions,
+Labeled evaluation and versioned quality policies are available locally. The next
+team platform milestone adds projects, permissions,
 shared labeling, review decisions, and history that survives policy changes.
 
 ## Validation and packaging
