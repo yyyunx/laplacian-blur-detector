@@ -8,6 +8,17 @@ permissions:
   contents: read
 
 jobs:
+  browser-utils:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Check browser code and CSV/sorting behavior
+        run: |
+          node --check web/app.js
+          node --test tests/web/batch-utils.test.mjs
   test:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 15

@@ -1,72 +1,57 @@
-# Roadmap: reusable engine to team collaboration
+# Roadmap: a reusable image quality tool
 
-This is a sequence of milestones with acceptance criteria, not a release-date promise.
-The open-source foundation and local labeled evaluation are implemented. The shared
-team workspace remains future work.
+The product is a general-purpose tool that people can use directly and developers
+can integrate or improve through GitHub. Development collaboration means issues,
+reviews, documentation, and code contributions. A shared labeling/review platform
+is outside the current product direction.
 
-## 1. Open-source foundation — implemented
+## Implemented: open-source foundation
 
-- Install a library, CLI, or optional API from the same project metadata.
-- Preserve existing score behavior and checkout entry points.
-- Define contribution, bug report, feature proposal, and review workflows.
-- Run lint, regression tests, packaging, and installed-wheel checks in CI.
+- Installable library and CLI, optional HTTP service, and bundled browser assets.
+- Compatible checkout entry points, contribution guide, issue/PR templates, and CI.
+- Optional developer benchmarking for comparing detector changes with human judgments.
 
-The foundation was pushed and its GitHub CI passed. Remaining maintainer operations:
-configure branch protection/review requirements, enable private security reporting,
-and decide when to tag or publish the first packaged release. These settings are
-not enabled by local files.
+Branch protection, private security reporting, and package publishing remain
+maintainer operations. A committed configuration does not enable repository settings.
 
-## 2. Reproducible quality evaluation — local tooling implemented
+## Implemented: practical batch workflow
 
-User outcome: a contributor can prove that a change improves a particular use case.
+- Select or drop multiple files; inspect each preview and result.
+- Track progress, cancel remaining requests, resume pending files, and retry failures.
+- Filter by outcome, sort by score or name, and export the entire queue to CSV.
+- Use the batch API with ordered per-file results and isolated file errors.
+- Bound uploaded bytes, request streams, pre-decode dimensions, and analysis workers.
 
-- Define a labeled CSV schema: relative image path, domain, usable/retake label,
-  optional reason, and capture-group identifier for preventing split leakage.
-- Record rights/provenance for datasets and keep private datasets out of Git.
-- Compare thresholds on calibration data and report final results on held-out data.
-- Export false rejection, missed unusable image, and confusion-matrix reports.
-- Version preprocessing and quality policies. Include a document/photo example
-  alongside the existing vehicle use case without claiming universal thresholds.
+Users can start with their own images. No human labels or accounts are required.
+The detector still measures whole-image sharpness only; these changes improve
+usability and resource handling, not established real-world classification accuracy.
 
-Done when another contributor can reproduce an evaluation from a documented
-dataset manifest and configuration. Synthetic images alone do not establish accuracy.
+## Next: explain more image quality problems
 
-The CLI, manifest contract, calibration/test isolation checks, per-domain policies,
-fingerprinted reports, and a synthetic document/product example are now implemented.
-See [the guide](BENCHMARKING.md). Representative real datasets and human-reviewed
-labels still need to be supplied; real-world accuracy has not been established.
+- Add brightness, clipped exposure, and minimum-resolution measurements.
+- Give specific suggestions based on detected problems rather than one generic rejection.
+- Keep sharpness results separate from other quality findings so API clients can
+  choose which checks matter for documents, products, or another use case.
+- Compare local sharpness and additional metrics on relevant samples before changing
+  existing score semantics or rejection defaults.
 
-## 3. Shared review workspace — first team MVP
+Done when a caller can identify why an image needs attention and decide which
+checks apply without needing a labeling workflow.
 
-User outcome: multiple people can inspect the same dataset and resolve disagreements.
+## Next: smoother operation and integration
 
-- Sign in, create a workspace/project, and assign owner/contributor/reviewer roles.
-- Upload with byte/pixel limits and private storage; define consent, retention,
-  deletion, and export behavior.
-- Analyze using a selected policy version, then queue images for human labeling.
-- Add labels, review decisions, and disagreement handling. Record who changed what.
-- Prevent concurrent edits from silently overwriting labels; allow filtering and CSV export.
+- Measure latency and peak memory across supported resolutions and batch sizes.
+- Add deployment-specific timeouts, rate limits, and access controls where needed.
+- Improve dependency/release reproducibility and installation documentation.
+- Add examples for backend upload pipelines, document capture, and product photos.
+- Add a background-job interface only if real workloads outgrow bounded requests.
 
-Done when two authorized users can finish a shared review, unauthorized users
-cannot access the images or results, concurrent edits produce a visible conflict,
-and policy changes leave historical runs intact.
+Done when another developer can install, integrate, debug, and update the tool
+using documented contracts and reproducible checks.
 
-## 4. Reliable team operation
+## Optional contributor evaluation
 
-- Background jobs with progress, bounded concurrency, retries, and cancellation.
-- Idempotent analysis requests so retries do not create duplicate work.
-- API authentication, per-workspace quotas, structured errors, and audit logs.
-- Document backup/restore, schema migration, deletion, and deployment procedures.
-- Track queue age, analysis latency, failures, and resource usage.
-
-Done when a failed worker can resume work safely, quotas prevent one workspace
-from exhausting service resources, and a restore exercise succeeds.
-
-## 5. Broader quality capabilities
-
-Consider local sharpness maps, exposure, minimum resolution, and additional focus
-metrics after milestone 2 provides a trustworthy comparison process. Consider
-model-based subject detection only for use cases and datasets that justify it.
-
-Every addition must report known limitations, processing cost, and domain-specific
-evaluation results. A higher number of algorithms does not establish better quality.
+[Benchmarking](BENCHMARKING.md) is available for contributors who want labeled
+error reports, per-domain threshold calibration, and versioned policies. Synthetic
+examples verify the workflow; they do not establish real-world accuracy. This is
+an optional development aid, not a prerequisite or the main product flow.

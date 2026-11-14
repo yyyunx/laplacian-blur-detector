@@ -26,6 +26,14 @@ Depending on the package and platform, these components may include software suc
 * License: MIT License
 * Project: https://github.com/fastapi/fastapi
 
+## Pillow
+
+**Purpose:** Reading upload headers to validate format and image dimensions before pixel decoding.
+
+* License: MIT-CMU
+* Project: https://github.com/python-pillow/Pillow
+* Pillow is required by the optional HTTP server, not the core library or offline CLI.
+
 ## NumPy
 
 **Purpose:** Numerical operations and image-array processing.

@@ -1,3 +1,11 @@
 """Project-wide defaults."""
 
 DEFAULT_BLUR_THRESHOLD = 100.0
+
+# HTTP service limits; the offline library and CLI retain their existing behavior.
+MAX_UPLOAD_BYTES = 10 * 1024 * 1024
+MAX_IMAGE_PIXELS = 20_000_000
+MAX_BATCH_FILES = 20
+MAX_BATCH_BYTES = 50 * 1024 * 1024
+MULTIPART_OVERHEAD_BYTES = 1024 * 1024
+MAX_CONCURRENT_ANALYSES = 2

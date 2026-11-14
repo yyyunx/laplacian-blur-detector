@@ -2,6 +2,12 @@
 
 ## Unreleased — 0.3.0
 
+- Add browser batch selection, progress/cancellation, failed-file retries,
+  filtering, sorting, and CSV export without requiring labels or accounts.
+- Add a batch API with per-file outcomes and public configuration endpoint.
+- Bound encoded uploads, request streams, image dimensions before OpenCV decode,
+  and active analysis workers; return actionable error codes and busy hints.
+- Refocus the roadmap on a reusable tool and open-source development.
 - Add labeled dataset benchmarking with independent calibration/test splits,
   per-domain threshold selection, configurable class-error weights, frozen quality
   policies, held-out confusion metrics, and CSV error lists.

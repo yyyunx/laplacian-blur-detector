@@ -3,74 +3,66 @@
 ## Current implementation
 
 ```text
-Python caller ---------> laplacian_blur_detector.blur_detector
-CLI -------------------> image_utils + blur_detector
+Python caller ---------> blur_detector
+Single-image CLI ------> image_utils + blur_detector
 Dataset evaluator -----> image_utils + blur_detector ---> local CSV
-Labeled benchmark -----> manifest + evaluation ---------> policy + held-out reports
-Browser demo ----------> FastAPI ----------------------> image_utils + blur_detector
+Optional benchmark ----> manifest + evaluation ---------> local policy/reports
+Browser batch queue ---> bounded single-image API ------> header check + blur_detector
+Backend integration ---> bounded batch API -------------> ordered per-file results
 ```
 
 `laplacian_blur_detector` is the public Python namespace. Importing it loads the
-measurement core without requiring FastAPI or Uvicorn. `.[server]` adds the HTTP
-interface and demo. The root `web/` directory is the editable source of the demo;
-wheel builds place its assets inside the installed package.
+measurement core without FastAPI, Uvicorn, or Pillow. `.[server]` adds HTTP serving
+and Pillow header inspection. The root `web/` directory is the editable source;
+wheel builds bundle its assets, including the JavaScript module for CSV and sorting.
 
-The root `src/`, `api/main.py`, and `scripts/` modules are compatibility entry points
-for existing checkout users. New integrations should use the installed package
-or the documented HTTP API. Compatibility modules delegate to the package so there
-is one implementation of the algorithm.
+The root `src/`, `api/main.py`, and `scripts/` are compatibility entry points.
+They delegate to the package so there is one implementation of the detector.
 
-The current service is stateless. It has no shared workspace, database, identity
-provider, annotation queue, or stored image history. Scores are Laplacian variance,
-not calibrated confidence values. The default threshold is a development default.
+## Browser workflow
 
-`evaluation.py` provides image-independent confusion metrics and threshold
-calibration. `benchmark.py` validates a labeled manifest, scores the exact bytes
-whose hashes are recorded, calibrates a separate threshold for each domain, and
-exports a frozen policy plus per-split reports. Test samples do not participate in
-threshold selection. Existing reports are not overwritten. The HTTP API remains
-a stateless single-threshold service; policy loading is currently CLI-only.
+The browser maintains a local queue of file references and sends one image at a
+time only after the user starts analysis. Results, failures, filters, and previews
+live in browser memory. Cancellation aborts the current client request and stops
+future requests; server work already accepted may still finish. Retrying failed
+files preserves completed results. Threshold edits invalidate previous results.
+CSV export includes the whole queue in the selected sort order, including pending
+and failed rows. Clearing the queue or reloading clears local results.
 
-## Boundaries for future work
+## HTTP resource boundaries
 
-Keep four concerns separate:
+Streaming middleware counts incoming request bytes before multipart parsing,
+including requests without Content-Length. Oversized multipart parsing closes
+opened upload files. Endpoints read at most the per-file limit plus one byte and
+close all upload handles, including on errors.
 
-1. **Measurement:** compute named metrics from explicitly preprocessed pixels.
-2. **Quality policy:** choose domain-specific rules and thresholds, with immutable versions.
-3. **Evaluation:** compare results with labeled datasets and report failure cases.
-4. **Collaboration:** authorize people to manage datasets, labels, reviews, and policy changes.
+Worker-thread analysis checks JPEG/PNG headers and dimensions with Pillow before
+OpenCV decoding. A per-process bounded semaphore allows two active analyses;
+additional work receives a retryable busy error instead of joining an unbounded
+CPU queue. Batch API files are analyzed serially and returned in input order.
+A file error is recorded for that file while other valid files continue.
 
-A document-scanning policy and a product-photo policy may use the same measurement
-while having different acceptance rules. Do not put vehicle, customer, or team
-conditions into `calculate_blur_score`.
+The service does not persist images or results. Multipart uploads may spool to
+local temporary files during a request; these are closed after the request. The
+service does not add authentication, per-client rate limiting, or network timeouts.
+See [SECURITY.md](../SECURITY.md) for deployment boundaries.
 
-Before adding a second metric, propose its input types, preprocessing, score range,
-direction, errors, runtime cost, and validation dataset. Introduce a shared detector
-interface when those concrete needs are known; do not add a plugin framework solely
-to wrap the existing single function.
+## Extension rules
 
-## Proposed collaboration model (not implemented)
+- Keep measurement independent of HTTP, browser state, storage, and image domains.
+- Add quality measurements without silently changing existing blur score semantics.
+- Keep domain-specific acceptance rules outside the measurement core.
+- Keep browser state and exports separate from server measurement logic.
+- Document inputs, preprocessing, output scale, errors, and runtime cost for new metrics.
 
-```text
-Workspace -> Membership (role)
-Workspace -> Project -> Dataset -> Image
-Project -> QualityPolicyVersion
-Image + QualityPolicyVersion -> AnalysisRun
-Image -> Annotation -> ReviewDecision
-Mutations -> AuditEvent
-```
+For example, document capture and product photography may use the same sharpness
+metric with different acceptance rules. Do not add vehicle-specific conditions to
+`calculate_blur_score`. Introduce a common metric/plugin interface when a second
+concrete implementation needs it, rather than adding a framework around one function.
 
-An analysis run should record detector version, policy version, preprocessing,
-measurements, decision, and timing. Re-running analysis creates a new run; changing
-a threshold must not silently rewrite old decisions.
+## Optional developer evaluation
 
-Suggested initial roles are owner, contributor, and reviewer. Membership must be
-checked server-side for every resource and download; identifiers alone are never
-authorization. Define whether reviewers may approve their own labels before building
-the review queue. Use a revision field for concurrent label updates and return a
-conflict instead of silently overwriting another contributor's work.
-
-Use a relational store for metadata and private object storage for images once
-persistence is approved as part of the product design. Establish a workspace's
-retention/deletion policy before accepting real images. Do not reuse public sample
-assets as a storage mechanism for team uploads.
+`evaluation.py` implements image-independent confusion metrics and calibration.
+`benchmark.py` validates manifests, records exact byte hashes, separates calibration
+and test samples, and exports frozen policies. It is an optional contributor tool.
+The HTTP API currently accepts a numeric threshold; it does not load policy files.

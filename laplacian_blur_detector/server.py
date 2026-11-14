@@ -12,6 +12,7 @@ def main(argv: list[str] | None = None) -> int:
         import uvicorn
         import fastapi  # noqa: F401
         import multipart  # noqa: F401
+        from PIL import Image  # noqa: F401
     except ImportError:
         parser.exit(1, 'Install the server dependencies: pip install ".[server]"\n')
     uvicorn.run("laplacian_blur_detector.api:app", host=args.host, port=args.port)

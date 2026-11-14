@@ -3,30 +3,30 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="Laplacian Variance image sharpness analysis demo" />
+    <meta name="description" content="Check image sharpness in batches, compare results, and export a report." />
     <title>Laplacian Blur Detector</title>
-    <link rel="stylesheet" href="/static/styles.css?v=dashboard-dom-v2" />
+    <link rel="stylesheet" href="/static/styles.css?v=batch-v1" />
   </head>
   <body>
     <main class="page-shell">
       <header class="hero" aria-labelledby="page-title">
         <p class="eyebrow">Standalone image quality service</p>
         <h1 id="page-title">Laplacian Blur Detector</h1>
-        <p class="subtitle">Image Sharpness Analysis with Laplacian Variance</p>
+        <p class="subtitle">Check a batch. Find blurry images. Export the results.</p>
       </header>
 
       <section class="dashboard" aria-label="Image analysis dashboard">
         <section class="image-panel" aria-labelledby="image-title">
           <div class="panel-heading">
             <p class="eyebrow" id="image-title">Image preview</p>
-            <button class="text-button" id="change-image-button" type="button" hidden>Choose another</button>
+            <button class="text-button" id="change-image-button" type="button">Add images</button>
           </div>
-          <div class="preview-card">
-            <label class="drop-zone" id="drop-zone" for="image-input">
-              <input id="image-input" type="file" accept="image/jpeg,image/png,.jpg,.jpeg,.png" />
+          <div class="preview-card" id="upload-surface">
+            <label class="drop-zone" id="drop-zone" for="image-input" tabindex="0" role="button">
+              <input id="image-input" type="file" accept="image/jpeg,image/png,.jpg,.jpeg,.png" multiple aria-label="Choose images" />
               <span class="upload-icon" aria-hidden="true">↑</span>
-              <strong>Upload an image</strong>
-              <span>Drop a JPG, JPEG, or PNG here</span>
+              <strong>Choose images</strong>
+              <span>Drop JPG, JPEG, or PNG files here</span>
             </label>
             <div class="preview-wrap" id="preview-wrap" hidden>
               <img id="image-preview" alt="Selected image preview" />
@@ -39,12 +39,14 @@
           <section class="settings-section" aria-labelledby="settings-title">
             <p class="eyebrow" id="settings-title">Analysis settings</p>
             <label class="threshold-label" for="threshold-input">
-              <span>Blur threshold</span><strong id="threshold-value">100.00</strong>
+              <span>Blur threshold</span>
+              <input id="threshold-input" type="number" min="0" value="100" step="any" inputmode="decimal" required />
             </label>
-            <input id="threshold-input" type="range" min="0" max="400" value="100" step="1" />
-            <div class="range-labels"><span>More sensitive</span><span>More tolerant</span></div>
-            <button id="analyze-button" type="button" disabled>Analyze image</button>
+            <button id="analyze-button" type="button" disabled>Analyze images</button>
+            <button id="retry-button" class="secondary-button" type="button" hidden>Retry failed</button>
+            <button id="cancel-button" class="secondary-button" type="button" hidden>Cancel remaining</button>
             <p class="hint">A score below the threshold is classified as blurry.</p>
+            <p class="hint" id="upload-limits">Up to 20 files · 10 MiB each · 20 megapixels per image</p>
           </section>
 
           <section class="result-section" aria-live="polite" aria-labelledby="result-section-title">
@@ -55,7 +57,7 @@
               </div>
               <span class="result-badge neutral" id="result-badge">PENDING</span>
             </div>
-            <p class="result-message" id="result-message">Upload an image and run analysis.</p>
+            <p class="result-message" id="result-message">Choose images, then run analysis.</p>
 
             <div class="result-details" id="result-details" hidden>
               <div class="metrics-grid">
@@ -80,12 +82,36 @@
         </section>
       </section>
 
+      <p class="upload-message" id="upload-message" role="alert" hidden></p>
+      <section class="batch-panel" aria-labelledby="batch-title">
+        <div class="batch-heading">
+          <div><p class="eyebrow">Batch results</p><h2 id="batch-title">Your images</h2></div>
+          <div class="batch-actions">
+            <button id="export-button" class="secondary-button" type="button" disabled>Export all CSV</button>
+            <button id="clear-button" class="text-button" type="button" disabled>Clear all</button>
+          </div>
+        </div>
+        <div class="batch-counts" aria-label="Batch summary">
+          <div><strong id="count-total">0</strong><span>Selected</span></div>
+          <div><strong id="count-clear">0</strong><span>Clear</span></div>
+          <div><strong id="count-blurry">0</strong><span>Blurry</span></div>
+          <div><strong id="count-error">0</strong><span>Failed</span></div>
+        </div>
+        <div class="progress-line"><span id="progress-label" role="status">Add images to get started.</span><progress id="analysis-progress" value="0" max="1" aria-labelledby="progress-label"></progress></div>
+        <div class="batch-filters">
+          <label for="status-filter">Show <select id="status-filter"><option value="all">All images</option><option value="blurry">Blurry</option><option value="clear">Clear</option><option value="error">Failed</option><option value="pending">Pending</option></select></label>
+          <label for="sort-order">Sort <select id="sort-order"><option value="added">Added order</option><option value="score-asc">Lowest score first</option><option value="score-desc">Highest score first</option><option value="name">Filename</option></select></label>
+        </div>
+        <div class="table-scroll"><table class="results-table"><caption class="sr-only">Select a filename to inspect its image and result.</caption><thead><tr><th scope="col">Filename</th><th scope="col">Status</th><th scope="col">Score</th><th scope="col">Resolution</th><th scope="col">Size</th><th scope="col"><span class="sr-only">Actions</span></th></tr></thead><tbody id="batch-results"><tr><td colspan="6" class="empty-row">Your results will appear here.</td></tr></tbody></table></div>
+        <p class="hint">Select a filename to inspect it above. Scores measure edge detail; they are not confidence percentages.</p>
+      </section>
+
       <details class="api-response" id="api-response" hidden>
         <summary>Raw API Response</summary>
         <pre id="raw-response"></pre>
       </details>
     </main>
-    <footer>Traditional computer-vision metric · No images are stored by this demo</footer>
-    <script src="/static/app.js?v=dashboard-dom-v2"></script>
+    <footer>Traditional computer-vision metric · No images retained after analysis</footer>
+    <script type="module" src="/static/app.js?v=batch-v1"></script>
   </body>
 </html>

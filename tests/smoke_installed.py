@@ -56,7 +56,7 @@ def main() -> None:
         with TestClient(app) as client:
             assert client.get("/healthz").json() == {"status": "ok"}
             assert "Laplacian Blur Detector" in client.get("/").text
-            for asset in ("app.js", "styles.css"):
+            for asset in ("app.js", "batch-utils.js", "styles.css"):
                 assert client.get(f"/static/{asset}").status_code == 200
             response = client.post(
                 "/api/blur/check",
@@ -64,6 +64,12 @@ def main() -> None:
             )
             assert response.status_code == 200
             assert response.json()["is_blurry"] is True
+            batch = client.post("/api/blur/batch", files=[
+                ("images", ("sample.png", image.read_bytes(), "image/png")),
+                ("images", ("bad.png", b"invalid", "image/png")),
+            ])
+            assert batch.status_code == 200
+            assert batch.json()["processed"] == batch.json()["failed"] == 1
     print(f"Installed package smoke checks passed: {package_dir}")
 
 

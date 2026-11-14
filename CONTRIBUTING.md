@@ -16,6 +16,10 @@ python -m ruff check .
 python -m pytest -q
 ```
 
+With Node.js 22 or newer, run `node --test tests/web/batch-utils.test.mjs`
+and `node --check web/app.js` for browser sorting/export and syntax checks.
+No npm runtime dependencies are needed by the browser tool.
+
 Run `laplacian-blur-serve` for the browser demo and `/docs` API documentation.
 Changes to the root `web/` directory appear in the editable checkout. The package
 build bundles those same assets for installations outside the checkout.
@@ -23,9 +27,10 @@ build bundles those same assets for installations outside the checkout.
 ## Pick a contribution
 
 - Reproduce a bug and add a focused regression test.
+- Improve batch handling, actionable errors, integration examples, or measured performance.
 - Improve usage instructions or add a domain example with clear limitations.
 - Propose a quality metric with a written contract and evaluation evidence.
-- Help define dataset labels, disagreement handling, and calibration reports.
+- Optionally improve developer benchmark schemas and calibration reports.
 
 For substantial features, open a feature proposal with the user problem and
 acceptance criteria before introducing new services or dependencies. Consult

@@ -2,8 +2,8 @@
 
 The benchmark command turns a shared CSV of human judgments into reproducible
 measurements, per-domain thresholds, and a held-out error report. It runs locally;
-images are not uploaded. This is the evaluation foundation for future team labeling,
-not an annotation UI or multi-user service.
+images are not uploaded. It is an optional developer tool for comparing detector
+changes. The browser checker, ordinary CLI, and API do not require labeled datasets.
 
 ## Try the whole workflow
 

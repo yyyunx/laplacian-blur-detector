@@ -1,28 +1,39 @@
 # Security policy
 
-The project is an early-stage image analysis library and demo service. A packaged
-release is not a claim that the HTTP service is ready for an untrusted public network.
-The current service has no authentication, team isolation, upload-size limits,
-decoded-pixel limits, or application-level rate limiting.
+The project is an early-stage image analysis library and bounded HTTP tool. A
+packaged release is not a claim that every public deployment requirement is met.
 
 ## Reporting a vulnerability
 
-If GitHub's private vulnerability reporting is enabled, use **Security > Report a
-vulnerability** in this repository. If that option is unavailable, open an issue
-requesting a private reporting channel without disclosing exploit details or
-affected users' data. A maintainer must establish that channel before details are sent.
+If GitHub private vulnerability reporting is enabled, use **Security > Report a
+vulnerability**. Otherwise open an issue requesting a private reporting channel
+without posting exploit details or user data. A maintainer must establish that
+channel before details are sent.
 
-Include affected versions, impact, and a minimal reproduction with synthetic or
-sanitized input. Do not post secrets, private photos, or working exploits publicly.
+Include affected versions, impact, and a minimal reproduction using synthetic or
+sanitized inputs. Do not post credentials, private photos, or working exploits.
 There is no guaranteed response time or maintained LTS branch at this stage.
 
-## Deployment boundaries
+## Implemented HTTP boundaries
 
-- The current API does not persist uploaded images. Adding collaboration and
-  storage requires explicit retention, access control, deletion, and backup rules.
-- CLI inputs must be trusted files; API deployments must enforce body-size,
-  decoded-image resource, timeout, and concurrency limits before public exposure.
-- Keep runtime dependencies updated and test upgrades before deployment.
-- Never commit credentials, production datasets, or personal images.
+- 10 MiB per encoded file; 20 files and 50 MiB of image bytes per batch API call.
+- Streaming request limits include 1 MiB of multipart overhead and apply without
+  Content-Length. Upload handles are closed on completion and validation failures.
+- Pillow checks supported content and a 20-million-pixel limit before OpenCV decode.
+- Worker-thread processing admits two active analyses per server process; busy
+  requests receive a retryable 503. A batch is processed serially within its request.
+- No persistent image/result storage. Multipart parsing can temporarily spool
+  uploads to local disk; deployment operators control that temporary filesystem.
 
-These deployment controls are planned work, not features supplied by this policy.
+Defaults live in `laplacian_blur_detector/config.py`. CLI and direct Python calls
+remain offline tools for trusted files and do not inherit the HTTP upload limits.
+
+## Deployment responsibilities
+
+Authentication, per-client rate limiting, connection/request timeouts, overall
+process memory/CPU limits, and temporary-disk quotas are deployment concerns that
+are not provided by these upload checks. Multiple server processes each have their
+own analysis limit. Keep runtime dependencies updated and test upgrades.
+
+Do not commit secrets, production datasets, or personal images. Review the data
+handling contract before adding any future persistence or external processing.
