@@ -15,7 +15,7 @@ the prior CLI/API/benchmark/heatmap contracts and adds opt-in diagnostic hints.
 Its baseline validation was 209 Python tests, 21 frontend tests, builds and
 installed-wheel smoke checks, plus seven successful CI jobs per milestone.
 
-Phase 5 starts from `4388749` on `codex/release-readiness-hardening`. Keep this
+Phase 5 starts from `4388749` on `feature/release-readiness`. Keep this
 review chain intact. After PR #1 is actually merged, inspect ancestry and the
 Phase 4 diff before deciding whether to retarget PR #2 to main; do not retarget
 or merge automatically. If the first PR is squash-merged, inherited commits may
@@ -23,6 +23,26 @@ need maintainer coordination rather than a blind base change.
 
 Both PR descriptions explicitly distinguish numeric/controller tests from pending
 desktop/mobile visual acceptance. No real-image accuracy improvement is claimed.
+
+## Safe branch naming migration
+
+| Canonical branch | Preserved commit at migration | Legacy review ref |
+| --- | --- | --- |
+| `feature/sharpness-heatmap-benchmark` | `fd2d00c` | `codex/sharpness-heatmap-benchmark` (PR #1 head, PR #2 base) |
+| `feature/image-quality-diagnostics` | `4388749` | `codex/image-quality-diagnostics` (PR #2 head) |
+| `feature/release-readiness` | `095fcf5` | Phase 5 ref renamed natively; no PR used the old ref |
+
+GitHub documents that renaming an open PR's head closes that PR. The first two
+branches therefore use same-SHA copies; both existing PRs retain their original
+head/base relationship and are not duplicated or closed. These two legacy refs
+are deliberately retained, not deleted. The Phase 5 branch had no PR head and
+was safely renamed through GitHub's native API, preserving its commit history.
+New development uses only the canonical naming convention.
+See [GitHub's branch rename behavior](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-branches-in-your-repository/renaming-a-branch).
+
+After PR #1 merges, a maintainer must inspect ancestry/diffs and both canonical
+and legacy refs before retargeting PR #2 or deleting legacy refs. Do not assume
+that same-SHA aliases automatically retarget PR heads or follow subsequent commits.
 
 ## Required gates before a formal release
 

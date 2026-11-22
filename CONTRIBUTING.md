@@ -40,6 +40,12 @@ acceptance criteria before introducing new services or dependencies. Consult
 
 ## Submit a change
 
+Use `feature/<name>`, `fix/<name>`, `docs/<name>`, `refactor/<name>`, or
+`release/<version>` for new branches. Do not use `codex/`, `ai/`, or other tool
+names as prefixes. The active hardening branch is `feature/release-readiness`.
+Some legacy review refs remain solely to keep existing draft PRs open; do not
+start new development on those refs or delete them without checking the PR chain.
+
 1. Fork the repository and create a descriptive branch.
 2. Keep the pull request focused. Explain the resulting behavior and compatibility.
 3. Run lint and the tests relevant to your changes. Add tests for new behavior
