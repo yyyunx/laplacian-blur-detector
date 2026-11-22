@@ -47,10 +47,15 @@ that same-SHA aliases automatically retarget PR heads or follow subsequent commi
 ## Required gates before a formal release
 
 - [x] Verify both draft PRs, intended bases and commit scope.
-- [ ] Measure 1080p, 4K, 12MP and safely feasible 20MP latency/peak RSS, including
+- [x] Measure 1080p, 4K, 12MP and safely feasible 20MP latency/peak RSS, including
   two concurrent large analyses; record environment and safety stops.
-- [ ] Check busy/error/cancellation/timeout recovery without freeing an active
+- [x] Check busy/error/cancellation/timeout recovery without freeing an active
   worker slot prematurely or allowing work to grow without bound.
+
+Resource results and test scope are recorded in [PERFORMANCE.md](PERFORMANCE.md).
+Cancellation checks cover coroutine cancellation/client-style timeout, not actual
+TCP/proxy disconnect behavior; no hard native-work deadline is implemented.
+
 - [ ] Complete real 1280px/390px browser visual acceptance, including EXIF,
   pointer/touch/keyboard, opacity, errors/retry and stale responses. A manual
   checklist is acceptable evidence of an open gate, not a passed gate.

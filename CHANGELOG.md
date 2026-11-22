@@ -2,6 +2,10 @@
 
 ## Unreleased — 0.3.0
 
+- Reduce full-image allocations for integer sharpness and diagnostic inputs while
+  preserving metric definitions and API contracts. Add opt-in guarded resource
+  profiling, measured 1080p–20MP/concurrent results, and cancellation/timeout
+  regression checks that retain active-worker slots until native work finishes.
 - Add a Quality Diagnostics panel to the existing selected-image page with
   measurements, evidence/warnings, suggestions and an editable opt-in JSON policy.
   Keep native sharpness units explicit, preserve strict policy JSON validation,

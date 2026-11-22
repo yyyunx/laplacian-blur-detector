@@ -203,3 +203,20 @@ image = np.zeros((16, 16), dtype=np.uint8)
 assert calculate_tenengrad_score(image) == 0
 assert len(analyze_local_sharpness(image)) == 64
 """], check=True, timeout=30)
+
+
+@pytest.mark.parametrize("dtype", [np.uint8, np.uint16, np.float32, np.float64])
+def test_native_storage_matches_float64_reference_without_mutating_input(dtype):
+    from laplacian_blur_detector.sharpness import _prepare_grayscale
+
+    image = np.random.default_rng(42).integers(0, 256, (133, 149), dtype=np.uint16).astype(dtype)
+    if dtype == np.uint16:
+        image *= 251
+    original = image.copy()
+    reference = image.astype(np.float64)
+    for metric in ("laplacian", "tenengrad"):
+        assert calculate_sharpness(image, metric) == calculate_sharpness(reference, metric)
+        assert analyze_local_sharpness(image, (3, 5), metric) == analyze_local_sharpness(reference, (3, 5), metric)
+    assert np.array_equal(image, original)
+    if dtype in (np.uint8, np.uint16):
+        assert np.shares_memory(_prepare_grayscale(image), image)
