@@ -25,6 +25,7 @@ dev = ["pytest>=8", "httpx>=0.27", "ruff>=0.9", "build>=1.2"]
 laplacian-blur = "laplacian_blur_detector.cli:main"
 laplacian-blur-evaluate = "laplacian_blur_detector.evaluate:main"
 laplacian-blur-benchmark = "laplacian_blur_detector.benchmark:main"
+laplacian-blur-demo = "laplacian_blur_detector.demo:main"
 laplacian-blur-serve = "laplacian_blur_detector.server:main"
 
 [project.urls]

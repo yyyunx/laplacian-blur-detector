@@ -53,6 +53,8 @@ def main() -> None:
         )
         run_command("laplacian-blur-benchmark", str(manifest), "--output", str(root / "benchmark"))
         assert (root / "benchmark" / "summary.json").is_file()
+        run_command("laplacian-blur-demo", "--output", str(root / "demo"), "--samples-per-case", "1")
+        assert (root / "demo" / "comparison" / "comparison.csv").is_file()
         with TestClient(app) as client:
             assert client.get("/healthz").json() == {"status": "ok"}
             assert "Laplacian Blur Detector" in client.get("/").text

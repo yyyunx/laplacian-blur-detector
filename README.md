@@ -9,10 +9,40 @@ product photography, and other image upload workflows.
 
 **Current status: early-stage, stateless toolkit.** The Python core measures
 Laplacian variance, Tenengrad, and local grid sharpness with an interactive relative
-heatmap. The CLI, batch decisions, and benchmark retain the original Laplacian
-variance calculation.
+heatmap. The benchmark can compare metrics using independent thresholds. The
+single-image CLI, batch decisions, and default benchmark retain the original
+Laplacian variance calculation.
 It is not a learned model or a complete image quality assessment. Use the browser
 tool, CLI, or API directly; accounts and manually labeled datasets are not required.
+
+## Five-minute quick start
+
+From an activated Python 3.10+ environment in this checkout:
+
+```bash
+python -m pip install -e ".[server]"
+laplacian-blur-demo --output outputs/my-first-demo
+laplacian-blur-serve
+```
+
+Open [the local tool](http://127.0.0.1:8000), select **Try generated demo**, then
+**Heatmap**. Switch metrics, adjust opacity, and inspect regions. Batch decisions
+remain independent. The demo command writes six synthetic stress cases, separate
+calibration/test captures, frozen per-metric policies, original/heatmap PNGs, and
+`comparison/comparison.csv`, `comparison.json`, and `metric-comparison.svg`.
+Open the SVG to compare held-out metrics and single-pass latency. Choose a new
+output directory for another run; existing artifacts are preserved.
+
+| Original | Relative Laplacian | Relative Tenengrad |
+| --- | --- | --- |
+| ![Generated crisp, softened, and flat content](docs/images/demo-original.png) | ![Static relative Laplacian illustration](docs/images/demo-laplacian.png) | ![Static relative Tenengrad illustration](docs/images/demo-tenengrad.png) |
+
+These are static outputs from the numeric core, **not browser screenshots**.
+Hatching identifies low texture. See the [recorded synthetic experiment](docs/EXPERIMENTS.md)
+for the actual comparison chart, measured results, and failure cases, and the
+[validation record](docs/VALIDATION.md) for checks performed and browser limitations.
+Synthetic labels are generation rules, not human judgments or evidence of
+real-world accuracy. No trained model or real-image accuracy improvement is claimed.
 
 ## Choose how to use it
 
@@ -22,6 +52,7 @@ tool, CLI, or API directly; accounts and manually labeled datasets are not requi
 | Single-image CLI | Checking an image locally |
 | Dataset CLI with CSV | Inspecting score distributions across a folder |
 | Browser tool and optional API | Checking batches, exporting results, and connecting another backend |
+| Multi-metric benchmark and demo | Independent calibration, frozen-policy replay, and reproducible comparisons |
 
 No images are persisted by the API. The browser previews selected images locally
 and uploads them only when analysis is requested. HTTP uploads may use temporary
@@ -347,6 +378,8 @@ not required to use the image checker. Label a dataset with `filename,label,spli
 ```bash
 laplacian-blur-benchmark data/labels.csv --calibrate --output outputs/experiment-01
 laplacian-blur-benchmark data/new-labels.csv --policy outputs/experiment-01/policy.json --output outputs/experiment-02
+laplacian-blur-benchmark data/labels.csv --compare --calibrate --output outputs/metric-comparison
+laplacian-blur-benchmark data/labels.csv --metric tenengrad --calibrate --output outputs/tenengrad
 ```
 
 Thresholds are selected per domain using calibration samples only. Held-out test
@@ -355,6 +388,15 @@ list. Reports preserve policy, preprocessing, dataset fingerprints, and runtime
 versions, and refuse to overwrite previous runs. Capture-group and duplicate-image
 checks help catch calibration/test overlap.
 
+`--compare` runs the existing benchmark once per metric, with independent
+thresholds and policies, then writes comparison CSV/JSON and an SVG chart.
+`--compare --policy outputs/metric-comparison` replays both frozen policies.
+`--metric tenengrad` requires its own explicit threshold, calibration, or frozen
+policy; the original default of Laplacian with threshold 100 is preserved.
+Summary metrics include balanced accuracy, retake precision/recall/F1, false
+reject/missed retake rates, and decode-plus-measurement latency. Missing class
+denominators are reported as null. The legacy `blur_score` CSV column holds the
+selected metric's raw value; it is not a shared score scale.
 
 See [the benchmarking guide](docs/BENCHMARKING.md) for the CSV format, objective,
 limitations, and a runnable synthetic document/product dataset example. Human

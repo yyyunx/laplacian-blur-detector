@@ -2,18 +2,19 @@
 
 ## Unreleased — 0.3.0
 
-- Add `--compare` with independent per-metric calibration/frozen replay,
-  held-out CSV/JSON, dependency-free SVG, per-reason summaries and latency.
-  Stage complete comparisons and reject datasets changed between metric runs.
-
-- Add versioned seeded synthetic sharp, Gaussian/motion/partial blur, flat-content,
-  and noisy-blur experiments, recording parameters and split-isolated capture groups.
-  Synthetic labels are generation conventions, not real-image accuracy evidence.
-
-- Add single-metric Tenengrad benchmarking with independent calibration, strict
-  frozen metric/preprocessing contracts, and separate decode/metric latency.
-  Preserve default Laplacian policies, CLI usage, and prediction columns.
-
+- Extend the existing benchmark with Tenengrad and `--compare`, retaining default
+  Laplacian behavior and existing prediction columns. Calibrate thresholds
+  independently per metric/domain, infer supported frozen-policy metrics, and
+  reject mismatched metric versions/preprocessing. Tenengrad has no inherited
+  Laplacian default threshold.
+- Export held-out comparison CSV/JSON and a dependency-free SVG chart, with
+  existing balanced accuracy, precision/recall/F1 and error rates, plus separately
+  recorded decode/metric latency, environment metadata, and per-reason summaries.
+- Add a one-command synthetic demo covering sharp, Gaussian/motion/partial blur,
+  flat content, and noise contamination, with disjoint source captures, recorded
+  seed/parameters, static heatmap illustrations, and a built-in browser demo image.
+- Document actual synthetic failures, reproducibility boundaries, and incomplete
+  desktop/mobile browser visual QA; no real-world accuracy improvement is claimed.
 - Add an interactive Relative Sharpness overlay with Original/Heatmap toggle,
   Laplacian/Tenengrad selection, grid/texture controls, opacity, hover/tap details,
   keyboard inspection, and separate low-texture hatching. Colors are relative to

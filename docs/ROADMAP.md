@@ -39,6 +39,17 @@ Visual QA on real desktop/mobile browser viewports remains pending because the
 browser automation tooling stopped during review; see [validation](VALIDATION.md).
 Static illustrations are numeric outputs, not browser screenshots.
 
+## Implemented: multi-metric experiments (Phase 3)
+
+- Extend the existing benchmark with independently calibrated Laplacian/Tenengrad policies.
+- Preserve default CLI/policy behavior, split isolation, fingerprints, and error reports.
+- Compare held-out classification metrics and decode-plus-measurement latency in CSV/JSON/SVG.
+- One-command reproducible six-condition synthetic dataset and demo artifacts.
+- Versioned metric/preprocessing checks and per-reason failure summaries.
+
+No real-image accuracy gain has been established. Local image-level aggregation
+is deferred until evidence/texture rules and aggregation behavior are specified.
+
 ## Next: explain more image quality problems
 
 - Add brightness, clipped exposure, and minimum-resolution measurements.
