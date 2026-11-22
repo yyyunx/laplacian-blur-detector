@@ -10,7 +10,9 @@ import hashlib
 import io
 import json
 from pathlib import Path, PurePosixPath, PureWindowsPath
+import platform
 import sys
+from time import perf_counter
 
 import cv2
 import numpy as np
@@ -20,8 +22,16 @@ from .blur_detector import calculate_blur_score
 from .config import DEFAULT_BLUR_THRESHOLD
 from .evaluation import calibrate_threshold, classification_metrics, finite_nonnegative
 from .image_utils import decode_image_bytes
+from .sharpness import calculate_tenengrad_score
 
 METRIC = {"name": "laplacian_variance", "version": 1, "preprocessing": "opencv_grayscale_native_v1"}
+METRICS = {
+    "laplacian": METRIC,
+    "tenengrad": {
+        "name": "tenengrad", "version": 1,
+        "preprocessing": "opencv_grayscale_native_float64_sobel3_energy_mean_v1",
+    },
+}
 REQUIRED_COLUMNS = {"filename", "label", "split", "group", "domain"}
 PREDICTION_COLUMNS = [
     "filename", "domain", "group", "split", "label", "reason", "sha256",
@@ -45,6 +55,7 @@ class ScoredSample:
     sample: Sample
     score: float
     sha256: str
+    processing_ms: float = 0.0
 
 
 def read_manifest(manifest: Path, image_root: Path | None = None, *, content: bytes | None = None) -> list[Sample]:
@@ -92,7 +103,9 @@ def read_manifest(manifest: Path, image_root: Path | None = None, *, content: by
     return samples
 
 
-def score_samples(samples: list[Sample]) -> list[ScoredSample]:
+def score_samples(samples: list[Sample], metric: str = "laplacian") -> list[ScoredSample]:
+    if metric not in METRICS:
+        raise ValueError("Unsupported benchmark metric.")
     scored: list[ScoredSample] = []
     hashes: dict[str, str] = {}
     for sample in samples:
@@ -102,11 +115,14 @@ def score_samples(samples: list[Sample]) -> list[ScoredSample]:
             if digest in hashes:
                 raise ValueError(f"Duplicate image bytes: {sample.filename!r} and {hashes[digest]!r}.")
             hashes[digest] = sample.filename
+            started = perf_counter()
             image = decode_image_bytes(data, sample.filename)
-            score = finite_nonnegative(calculate_blur_score(image))
+            measure = calculate_blur_score if metric == "laplacian" else calculate_tenengrad_score
+            score = finite_nonnegative(measure(image))
+            processing_ms = (perf_counter() - started) * 1000
         except (OSError, ValueError, cv2.error) as error:
             raise ValueError(f"Cannot evaluate {sample.filename!r}: {error}") from error
-        scored.append(ScoredSample(sample, score, digest))
+        scored.append(ScoredSample(sample, score, digest, processing_ms))
     return scored
 
 
@@ -114,11 +130,13 @@ def _canonical_json(value: dict) -> str:
     return json.dumps(value, ensure_ascii=False, sort_keys=True, indent=2, allow_nan=False) + "\n"
 
 
-def load_policy(path: Path) -> dict:
+def load_policy(path: Path, metric: str | None = "laplacian") -> dict:
     policy = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(policy, dict) or type(policy.get("schema_version")) is not int or policy["schema_version"] != 1:
         raise ValueError("Unsupported policy schema; expected schema_version 1.")
-    if policy.get("metric") != METRIC:
+    allowed = list(METRICS.values()) if metric is None else [METRICS[metric]]
+    descriptor = policy.get("metric")
+    if not isinstance(descriptor, dict) or type(descriptor.get("version")) is not int or descriptor not in allowed:
         raise ValueError("Policy metric or preprocessing is incompatible with this detector.")
     domains = policy.get("domains")
     if not isinstance(domains, dict) or not domains:
@@ -157,7 +175,7 @@ def _new_policy(scored: list[ScoredSample], manifest_hash: str, args: argparse.N
     calibration = [row for row in scored if row.sample.split == "calibration"] if args.calibrate else []
     return {
         "schema_version": 1,
-        "metric": METRIC,
+        "metric": METRICS[getattr(args, "metric", None) or "laplacian"],
         "detector_version": __version__,
         "runtime": {"opencv": cv2.__version__, "numpy": np.__version__},
         "selection": {
@@ -201,11 +219,20 @@ def run_benchmark(args: argparse.Namespace) -> dict:
     manifest_data = args.manifest.read_bytes()
     manifest_hash = hashlib.sha256(manifest_data).hexdigest()
     samples = read_manifest(args.manifest, args.image_root, content=manifest_data)
-    scored = score_samples(samples)
     candidates = []
     if args.policy:
-        policy = load_policy(args.policy)
+        policy = load_policy(args.policy, getattr(args, "metric", None))
+        metric = next(key for key, value in METRICS.items() if value == policy["metric"])
     else:
+        metric = getattr(args, "metric", None) or "laplacian"
+        policy = None
+    args.metric = metric
+    if not args.calibrate and not args.policy and args.threshold is None:
+        if metric != "laplacian":
+            raise ValueError("Tenengrad requires --calibrate, --policy, or its own explicit --threshold.")
+        args.threshold = DEFAULT_BLUR_THRESHOLD
+    scored = score_samples(samples, metric)
+    if policy is None:
         policy, candidates = _new_policy(scored, manifest_hash, args)
     _check_policy_test_isolation(policy, scored)
     predictions: list[dict] = []
@@ -240,10 +267,25 @@ def run_benchmark(args: argparse.Namespace) -> dict:
         "detector_version": __version__,
         "runtime": {"opencv": cv2.__version__, "numpy": np.__version__},
         "runtime_matches_policy": policy.get("runtime") == {"opencv": cv2.__version__, "numpy": np.__version__},
-        "metric": METRIC,
+        "metric": METRICS[metric],
         "manifest_sha256": manifest_hash,
         "policy_sha256": hashlib.sha256(policy_json.encode("utf-8")).hexdigest(),
         "by_domain": by_domain,
+        "processing_latency": {
+            "scope": "decode_and_metric_only_single_pass_no_warmup",
+            "unit": "ms",
+            "by_domain": {
+                domain: {
+                    split: _latency_summary([row.processing_ms for row in scored if row.sample.domain == domain and row.sample.split == split])
+                    for split in ("calibration", "test")
+                    if any(row.sample.domain == domain and row.sample.split == split for row in scored)
+                } for domain in by_domain
+            },
+        },
+        "environment": {
+            "python": platform.python_version(), "system": platform.system(),
+            "machine": platform.machine(), "opencv_threads": cv2.getNumThreads(),
+        },
     }
     summary_json = _canonical_json(summary)
     output.mkdir(parents=True)
@@ -252,11 +294,22 @@ def run_benchmark(args: argparse.Namespace) -> dict:
     _write_csv(output / "predictions.csv", PREDICTION_COLUMNS, predictions)
     errors = [row for row in predictions if row["split"] == "test" and row["outcome"] != "correct"]
     _write_csv(output / "errors.csv", PREDICTION_COLUMNS, errors)
+    _write_csv(output / "latency.csv", ["filename", "domain", "split", "processing_ms"], [
+        {"filename": row.sample.filename, "domain": row.sample.domain, "split": row.sample.split, "processing_ms": row.processing_ms}
+        for row in scored
+    ])
     if args.calibrate:
         _write_csv(output / "thresholds.csv", [
             "domain", "threshold", "false_reject", "missed_retake", "weighted_class_error",
         ], candidates)
     return summary
+
+
+def _latency_summary(values: list[float]) -> dict:
+    return {
+        "samples": len(values), "mean_ms": float(np.mean(values)),
+        "p50_ms": float(np.percentile(values, 50)), "p95_ms": float(np.percentile(values, 95)),
+    }
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
@@ -266,8 +319,9 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--output", type=Path, default=Path("outputs/benchmark"), help="New run directory (must not already exist)")
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--calibrate", action="store_true", help="Select a threshold per domain using calibration rows only")
-    mode.add_argument("--policy", type=Path, help="Evaluate without retuning a frozen JSON policy")
-    mode.add_argument("--threshold", type=float, default=DEFAULT_BLUR_THRESHOLD, help="Fixed threshold (default: 100)")
+    mode.add_argument("--policy", type=Path, help="Frozen JSON policy, or prior comparison directory with --compare")
+    mode.add_argument("--threshold", type=float, help="Fixed threshold (default: 100 for Laplacian only)")
+    parser.add_argument("--metric", choices=tuple(METRICS), help="Metric (default: Laplacian, or infer from frozen policy)")
     parser.add_argument("--false-reject-cost", type=float, help="Calibration weight for usable images rejected (default: 1)")
     parser.add_argument("--missed-retake-cost", type=float, help="Calibration weight for retake images accepted (default: 1)")
     args = parser.parse_args(argv)

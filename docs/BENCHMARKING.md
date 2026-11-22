@@ -143,3 +143,15 @@ exposure, and subject location can cause errors. The benchmark enables measuring
 these failures; calibration alone does not fix them. Local sharpness, exposure
 checks, and new algorithms should be compared on appropriate labeled data before
 they are adopted as quality gates.
+
+## Metric selection and timing
+
+Use `--metric tenengrad --calibrate` for an independently selected Tenengrad
+threshold. `--policy` infers its supported metric unless `--metric` is explicit;
+mismatched versions/preprocessing are rejected. Tenengrad needs its own explicit
+threshold or calibration/policy and never inherits the Laplacian default 100.
+
+Latency is recorded separately in `latency.csv` and summary metadata, without
+changing predictions CSV columns. It includes one decode plus metric call per
+image, without warmup, and excludes file IO/hashing/calibration/report writing.
+These timings are hardware/load dependent, not rigorous performance rankings.

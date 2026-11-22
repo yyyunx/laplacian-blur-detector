@@ -2,6 +2,10 @@
 
 ## Unreleased — 0.3.0
 
+- Add single-metric Tenengrad benchmarking with independent calibration, strict
+  frozen metric/preprocessing contracts, and separate decode/metric latency.
+  Preserve default Laplacian policies, CLI usage, and prediction columns.
+
 - Add an interactive Relative Sharpness overlay with Original/Heatmap toggle,
   Laplacian/Tenengrad selection, grid/texture controls, opacity, hover/tap details,
   keyboard inspection, and separate low-texture hatching. Colors are relative to
