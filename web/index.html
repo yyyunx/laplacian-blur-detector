@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="Check image sharpness in batches, compare results, and export a report." />
     <title>Laplacian Blur Detector</title>
-    <link rel="stylesheet" href="/static/styles.css?v=batch-v1" />
+    <link rel="stylesheet" href="/static/styles.css?v=heatmap-v1" />
   </head>
   <body>
     <main class="page-shell">
       <header class="hero" aria-labelledby="page-title">
         <p class="eyebrow">Standalone image quality service</p>
         <h1 id="page-title">Laplacian Blur Detector</h1>
-        <p class="subtitle">Check a batch. Find blurry images. Export the results.</p>
+        <p class="subtitle">Check a batch. Explore local detail. Compare measurements.</p>
       </header>
 
       <section class="dashboard" aria-label="Image analysis dashboard">
@@ -30,9 +30,34 @@
             </label>
             <div class="preview-wrap" id="preview-wrap" hidden>
               <img id="image-preview" alt="Selected image preview" />
+              <svg id="heatmap-overlay" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" tabindex="0" role="group" aria-label="Relative sharpness heatmap. Use arrow keys to inspect regions." aria-describedby="cell-information" hidden></svg>
             </div>
           </div>
           <p class="selected-file" id="selected-filename">No image selected</p>
+          <button id="demo-button" class="secondary-button" type="button">Try generated demo</button>
+          <section class="local-analysis" aria-labelledby="local-title">
+            <div class="panel-heading"><h2 id="local-title">Relative Sharpness</h2>
+              <div class="view-switch" aria-label="Preview mode">
+                <button id="view-original" type="button" aria-pressed="true">Original</button>
+                <button id="view-heatmap" type="button" aria-pressed="false" disabled>Heatmap</button>
+              </div>
+            </div>
+            <div class="local-settings">
+              <label>Metric<select id="local-metric"><option value="laplacian">Laplacian</option><option value="tenengrad">Tenengrad</option></select></label>
+              <label>Rows<input id="grid-rows" type="number" min="1" max="32" step="1" value="8" /></label>
+              <label>Columns<input id="grid-columns" type="number" min="1" max="32" step="1" value="8" /></label>
+              <label>Texture cutoff<input id="texture-cutoff" type="number" min="0" step="any" value="5" /></label>
+            </div>
+            <label class="opacity-control" for="heatmap-opacity">Opacity<input id="heatmap-opacity" type="range" min="0" max="100" value="55" /><output id="opacity-value" for="heatmap-opacity">55%</output></label>
+            <p id="heatmap-status" class="hint" role="status">Select an image to explore relative sharpness.</p>
+            <div id="heatmap-legend" hidden>
+              <div class="heatmap-scale"><span>Lower</span><span class="color-ramp" aria-hidden="true"></span><span>Higher</span></div>
+              <p id="heatmap-range" class="hint"></p>
+              <p class="texture-key"><span class="hatch-swatch" aria-hidden="true"></span>Low texture · insufficient evidence</p>
+            </div>
+            <p id="cell-information" class="cell-information" aria-live="polite">Hover or tap a cell. Focus the heatmap and use arrow keys to inspect regions.</p>
+            <p class="hint">Colors compare textured regions within this image only. They are not standardized across images or metrics and do not locate true blur. Grid cells must be at least 16 × 16 px.</p>
+          </section>
         </section>
 
         <section class="analysis-panel" aria-label="Analysis controls and result">
@@ -112,6 +137,6 @@
       </details>
     </main>
     <footer>Traditional computer-vision metric · No images retained after analysis</footer>
-    <script type="module" src="/static/app.js?v=batch-v1"></script>
+    <script type="module" src="/static/app.js?v=heatmap-v1"></script>
   </body>
 </html>

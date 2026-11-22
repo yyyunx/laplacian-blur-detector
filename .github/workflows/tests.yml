@@ -18,7 +18,8 @@ jobs:
       - name: Check browser code and CSV/sorting behavior
         run: |
           node --check web/app.js
-          node --test tests/web/batch-utils.test.mjs
+          node --check web/heatmap.js
+          node --test tests/web/*.test.mjs
   test:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 15

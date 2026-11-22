@@ -23,8 +23,21 @@ maintainer operations. A committed configuration does not enable repository sett
 - Bound uploaded bytes, request streams, pre-decode dimensions, and analysis workers.
 
 Users can start with their own images. No human labels or accounts are required.
-The detector still measures whole-image sharpness only; these changes improve
+Legacy decisions still use whole-image Laplacian sharpness. These changes improve
 usability and resource handling, not established real-world classification accuracy.
+
+## Implemented: core metrics and local visualization (Phases 1–2)
+
+- NumPy/OpenCV-only Laplacian and Tenengrad core, with configurable local grids.
+- Full-image derivatives before local statistics, avoiding synthetic grid borders.
+- Independent bounded local HTTP analysis with EXIF-aligned coordinates.
+- Relative Sharpness overlay, metric switch, opacity, hover/tap and keyboard inspection.
+- Separate low-texture hatching without a local blur classification.
+- Generated in-browser demo fixture and documented numeric/HTTP/controller tests.
+
+Visual QA on real desktop/mobile browser viewports remains pending because the
+browser automation tooling stopped during review; see [validation](VALIDATION.md).
+Static illustrations are numeric outputs, not browser screenshots.
 
 ## Next: explain more image quality problems
 

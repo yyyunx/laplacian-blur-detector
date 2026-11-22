@@ -16,8 +16,9 @@ python -m ruff check .
 python -m pytest -q
 ```
 
-With Node.js 22 or newer, run `node --test tests/web/batch-utils.test.mjs`
-and `node --check web/app.js` for browser sorting/export and syntax checks.
+With Node.js 22 or newer, run `node --test tests/web/*.test.mjs`,
+`node --check web/app.js`, and `node --check web/heatmap.js` for batch,
+relative mapping, heatmap controller, and syntax checks.
 No npm runtime dependencies are needed by the browser tool.
 
 Run `laplacian-blur-serve` for the browser demo and `/docs` API documentation.

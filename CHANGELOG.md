@@ -2,6 +2,29 @@
 
 ## Unreleased — 0.3.0
 
+- Add an interactive Relative Sharpness overlay with Original/Heatmap toggle,
+  Laplacian/Tenengrad selection, grid/texture controls, opacity, hover/tap details,
+  keyboard inspection, and separate low-texture hatching. Colors are relative to
+  the current image, not calibrated blur labels or cross-image scores.
+- Add `/api/sharpness/local`, sharing upload/decode/request/pixel limits and
+  analysis slots, with browser-aligned EXIF orientation, a 32×32 grid cap, and
+  minimum 16×16 pixel cells. Retain exact legacy blur endpoint response fields.
+- Correct unreleased local scoring to compute derivatives on the full image
+  before per-cell statistics, avoiding artificial grid-edge reflections and
+  preserving real cross-cell edges. Local scores near grid lines can change;
+  public signatures, result fields, whole-image metrics, and benchmark stay compatible.
+- Add numerical boundary, API/resource, mapping/controller tests and a synthetic
+  local demo generator; bundle the heatmap module in installed wheels.
+- Add NumPy/OpenCV-only core sharpness APIs: Tenengrad (mean squared 3×3 Sobel
+  gradient magnitude), a Laplacian/Tenengrad selector, and configurable local
+  grid analysis (default 8×8) with coordinates and complete remainder coverage.
+- Report local grayscale standard deviation and configurable low-texture flags
+  without treating low sharpness scores as blur decisions. Document metric
+  definitions, intensity scales, crop effects, and non-comparable score ranges
+  in the README and new Python API reference.
+- Add synthetic unit coverage for metric formulas, Gaussian/local blur, flat and
+  low-contrast content, invalid/empty inputs, non-divisible grids, and core-only
+  imports. Preserve existing detector, CLI, HTTP, Web UI, and benchmark behavior.
 - Add browser batch selection, progress/cancellation, failed-file retries,
   filtering, sorting, and CSV export without requiring labels or accounts.
 - Add a batch API with per-file outcomes and public configuration endpoint.

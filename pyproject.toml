@@ -41,6 +41,8 @@ packages = ["laplacian_blur_detector"]
 "web/index.html" = "laplacian_blur_detector/web/index.html"
 "web/app.js" = "laplacian_blur_detector/web/app.js"
 "web/batch-utils.js" = "laplacian_blur_detector/web/batch-utils.js"
+"web/heatmap.js" = "laplacian_blur_detector/web/heatmap.js"
+"web/demo.png" = "laplacian_blur_detector/web/demo.png"
 "web/styles.css" = "laplacian_blur_detector/web/styles.css"
 
 [tool.hatch.build.targets.sdist]
