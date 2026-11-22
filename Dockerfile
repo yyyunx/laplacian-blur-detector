@@ -9,5 +9,7 @@ COPY pyproject.toml README.md LICENSE THIRD_PARTY_NOTICES.md ./
 COPY laplacian_blur_detector ./laplacian_blur_detector
 COPY web ./web
 RUN pip install --no-cache-dir ".[server]"
+RUN useradd --system --uid 10001 --create-home sharpness
+USER 10001
 EXPOSE 8000
 CMD ["laplacian-blur-serve", "--host", "0.0.0.0", "--port", "8000"]

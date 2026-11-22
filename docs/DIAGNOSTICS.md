@@ -139,8 +139,9 @@ Errors/timeouts leave the original/heatmap workflow available and permit retry.
 ## Phase 4 validation and manual acceptance
 
 Core/API/controller tests, builds and installed-wheel smoke checks are automated.
-The final local suite contains 209 Python tests and 21 frontend tests. Each Phase 4
+The Phase 4 baseline contained 209 Python tests and 21 frontend tests. Each Phase 4
 milestone runs the Windows/Ubuntu × Python 3.10/3.12/3.13 CI matrix before proceeding.
+Current candidate evidence is maintained in [release readiness](RELEASE_READINESS.md).
 No benchmark labels or data were changed and no accuracy gain is claimed.
 
 Actual browser QA remains **not completed**. On the Phase 4 review attempt,

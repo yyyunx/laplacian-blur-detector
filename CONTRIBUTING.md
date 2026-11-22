@@ -77,10 +77,16 @@ Use [the security policy](SECURITY.md) for vulnerability reports.
 
 ## Release checklist
 
+Use the evidence/status in [Release readiness](docs/RELEASE_READINESS.md) and
+[draft notes](docs/RELEASE_NOTES.md). Passing tests does not check off pending
+browser acceptance or operator deployment controls.
+
 1. Update `laplacian_blur_detector/__init__.py` and the changelog together.
 2. Run `python -m ruff check .`, `python -m pytest -q`, and `python -m build`.
 3. Install the built wheel in a clean environment with server dependencies, then
    run `tests/smoke_installed.py` from outside the checkout.
 4. Verify the CI matrix, documented compatibility, and third-party notices.
+   Also run the Node suite, clean sdist installation, and Docker/live HTTP smoke;
+   perform real desktop/mobile QA and dependency/image vulnerability review.
 5. Have a maintainer create the release. No workflow currently publishes to PyPI
    or deploys a hosted service automatically.

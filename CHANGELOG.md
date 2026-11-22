@@ -2,6 +2,10 @@
 
 ## Unreleased — 0.3.0
 
+- Add release gates/notes, local integration and live-HTTP smoke examples, explicit
+  security review/caveats, generated manual-QA EXIF fixtures, and a non-root Docker
+  image with an allowlisted build context and CI container build/runtime smoke job. Preserve pending visual
+  acceptance and deployment responsibilities instead of claiming production readiness.
 - Reduce full-image allocations for integer sharpness and diagnostic inputs while
   preserving metric definitions and API contracts. Add opt-in guarded resource
   profiling, measured 1080p–20MP/concurrent results, and cancellation/timeout

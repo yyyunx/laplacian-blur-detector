@@ -30,6 +30,10 @@ without introducing application-level blur decisions. Existing consumers keep
 calling `blur_detector`; benchmark policies and legacy service response schemas
 do not change. See the [API reference](API.md) for the measurement contract.
 
+Integer grayscale storage is retained until float64 derivative output; diagnostics
+releases its bright-pixel mask before computing derivatives. See measured
+[resource costs](PERFORMANCE.md) and cancellation limitations.
+
 ## Browser workflow
 
 The browser maintains a local queue of file references and sends one image at a

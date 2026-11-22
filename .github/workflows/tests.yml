@@ -8,6 +8,24 @@ permissions:
   contents: read
 
 jobs:
+  container:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - name: Build container
+        run: docker build --tag sharpness-smoke .
+      - name: Start bounded non-root read-only service
+        run: |
+          docker run --detach --name sharpness-smoke --memory=1536m --cpus=2 --pids-limit=128 --read-only --tmpfs /tmp:rw,noexec,nosuid,size=64m --publish 127.0.0.1:8000:8000 sharpness-smoke
+          test "$(docker exec sharpness-smoke id -u)" = 10001
+      - name: Live HTTP contracts and bundled assets
+        run: python tests/smoke_http.py
+      - name: Container logs and cleanup
+        if: always()
+        run: |
+          docker logs sharpness-smoke || true
+          docker rm --force sharpness-smoke || true
   browser-utils:
     runs-on: ubuntu-latest
     steps:
@@ -51,5 +69,14 @@ jobs:
           python -m pip install --force-reinstall --no-deps $wheel
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Check installed package outside checkout
+        working-directory: ${{ runner.temp }}
+        run: python "${{ github.workspace }}/tests/smoke_installed.py"
+      - name: Install source distribution
+        shell: pwsh
+        run: |
+          $sourceArchive = (Get-ChildItem dist/*.tar.gz).FullName
+          python -m pip install --force-reinstall --no-deps $sourceArchive
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Check installed source distribution outside checkout
         working-directory: ${{ runner.temp }}
         run: python "${{ github.workspace }}/tests/smoke_installed.py"

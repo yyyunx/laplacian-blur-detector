@@ -20,7 +20,18 @@ tool, CLI, or API directly; accounts and manually labeled datasets are not requi
 
 ## Five-minute quick start
 
-From an activated Python 3.10+ environment in this checkout:
+Use Python 3.10+. For a new checkout:
+
+```bash
+git clone https://github.com/yyyunx/laplacian-blur-detector.git
+cd laplacian-blur-detector
+# For this unreleased candidate (before the draft PRs are merged):
+git switch --track origin/feature/release-readiness
+python -m venv .venv
+```
+
+Activate `.venv` using the Windows/Linux steps under [Installation](#installation),
+then install and run from this checkout:
 
 ```bash
 python -m pip install -e ".[server]"
@@ -50,6 +61,11 @@ for the actual comparison chart, measured results, and failure cases, and the
 [validation record](docs/VALIDATION.md) for checks performed and browser limitations.
 Synthetic labels are generation rules, not human judgments or evidence of
 real-world accuracy. No trained model or real-image accuracy improvement is claimed.
+
+Before formal release, review [release gates](docs/RELEASE_READINESS.md),
+[actual resource costs](docs/PERFORMANCE.md), [integration examples](docs/INTEGRATION.md)
+and [pending browser QA](docs/BROWSER_QA.md). This remains an unreleased candidate;
+automated checks do not establish desktop/mobile visual acceptance.
 
 ## Choose how to use it
 
