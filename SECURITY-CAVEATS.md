@@ -12,7 +12,12 @@ as an unauthenticated public production service or a formal release.
 - Authentication, TLS, rate/connection limits, proxy deadlines, process budgets,
   monitoring and incident ownership belong to the deployment operator.
 - Dependency ranges are not a deployment lock. CI and `pip check` are not CVE
-  scans. Dedicated dependency/container scanning remains a maintainer release gate.
+  scans. Final follow-up pip-audit found six unique installer advisories in pip
+  25.0.1; local environments were repaired and a separate Docker bootstrap fix is
+  supplied. Full-image Trivy artifacts and findings require maintainer review.
+  CI report collection can succeed while reporting vulnerabilities; it is not a
+  severity-based publication gate. Reports are retained for 14 days: preserve
+  reviewed evidence before expiry and rescan before release.
 - Encoded brightness/exposure/sharpness proxies cannot establish complete photo
   quality or real-world accuracy. Low texture is insufficient evidence.
 

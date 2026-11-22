@@ -2,6 +2,9 @@
 
 ## Unreleased — 0.3.0
 
+- Pin the reviewed Docker base digest and upgrade its vulnerable pip bootstrap to
+  26.3 before dependency installation. Retain full-image Trivy reports in CI;
+  successful report collection is not a vulnerability-free or release approval claim.
 - Handle transient connection resets during live-service readiness checks within
   a fixed deadline; retain strict health/analysis assertions after startup.
 - Add release gates/notes, local integration and live-HTTP smoke examples, explicit

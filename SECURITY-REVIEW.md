@@ -25,8 +25,31 @@ not a penetration test, a security guarantee, or public-deployment approval.
 - Staged files receive targeted credential/private-key pattern checks before
   push; fixtures are generated. This is not a historical secret audit.
 - Clean installation, `pip check`, build/runtime and Windows/Linux CI are
-  compatibility evidence. A dedicated CVE/container vulnerability scan was
-  **not run** in Phase 5 and remains a release gate.
+  compatibility evidence. The final follow-up uses pip-audit 2.10.1 and Gitleaks
+  8.30.1, with full-image Trivy 0.76.2 reports collected in CI. Read the actual
+  findings/limitations in PR #3 and the dependent installer-fix PR; scanner
+  execution success does not imply absence of vulnerabilities.
+
+## SEC-004: Vulnerable pip bootstrap in build environments
+
+- Severity/status: Moderate installer risk; source fix supplied, requires the
+  corresponding Docker build/scan evidence before release.
+- Evidence: pip-audit found 12 records (six unique Advisory IDs) in pip 25.0.1
+  from the clean build environments; CI's Docker install log also reported that
+  bootstrap version. The 18 application runtime dependencies had no reported
+  known vulnerabilities, with Linux CI and Windows inventories exactly matching.
+- Impact: affected installer paths can process malicious wheels/index URLs;
+  this is distinct from unauthenticated image analysis. Some advisories depend
+  on Python/archive behavior, so applicability is not identical for all six.
+- Required fix: upgrade pip to audited 26.3 before processing project dependency
+  archives. Docker pins the reviewed base digest; refresh that digest and pip
+  version together with actual release-time image scans.
+- Validation: three isolated local environments upgraded and passed `pip check`;
+  pip-audit re-scan reported no known vulnerabilities. CI collects the actual
+  final image (including added OS libraries), rather than treating a base-only
+  scan as equivalent. Check its JSON artifact for findings and DB metadata.
+- Owner/target: release maintainer, before publication. PR #3 remains the original
+  six Phase 5 commits; the necessary fix is independently reviewable.
 
 ## SEC-001: Public deployment requires operator controls
 
@@ -58,7 +81,9 @@ not a penetration test, a security guarantee, or public-deployment approval.
 
 - Severity/status: Low for local development; open release gate.
 - Evidence/reproduction: [browser acceptance](docs/BROWSER_QA.md) is Pending,
-  dependency ranges are not frozen, and there is no dedicated CVE/image scan.
+  dependency ranges are not frozen, and final CVE/image findings still require
+  release-maintainer review. The earlier Phase 5 baseline had no dedicated scan;
+  final follow-up evidence is attached to PR #3 and the dependent fix PR.
 - Impact: builds/tests do not establish visual/input acceptance or absence of
   vulnerabilities. CI does not configure repository protections/approvals.
 - Required fix: human QA, dependency/image scan at release time and maintainer
