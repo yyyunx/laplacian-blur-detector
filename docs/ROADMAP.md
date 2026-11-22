@@ -50,7 +50,7 @@ Static illustrations are numeric outputs, not browser screenshots.
 No real-image accuracy gain has been established. Local image-level aggregation
 is deferred until evidence/texture rules and aggregation behavior are specified.
 
-## Next: explain more image quality problems
+## Implemented: configurable quality diagnostics (Phase 4)
 
 - Phase 4 now measures mean/median brightness, dark/bright-channel ratios,
   resolution and existing sharpness, with configurable advisory hints in the core,
@@ -67,9 +67,17 @@ is deferred until evidence/texture rules and aggregation behavior are specified.
 Done when a caller can identify why an image needs attention and decide which
 checks apply without needing a labeling workflow.
 
-## Next: smoother operation and integration
+## Release readiness (Phase 5)
 
-- Measure latency and peak memory across supported resolutions and batch sizes.
+- Measured 1080p–20MP latency/peak RSS and concurrent workers; reduced avoidable
+  integer grayscale copies. See [resource evidence](PERFORMANCE.md).
+- Added cancellation/timeout slot recovery checks, reproducible manual-QA fixtures,
+  integration/HTTP smoke examples, non-root container and release/security records.
+- Complete [pending browser acceptance](BROWSER_QA.md), maintainer review and
+  release-time dependency/image vulnerability scanning before formal publication.
+
+## Next: deployment-specific operation
+
 - Add deployment-specific timeouts, rate limits, and access controls where needed.
 - Improve dependency/release reproducibility and installation documentation.
 - Add examples for backend upload pipelines, document capture, and product photos.

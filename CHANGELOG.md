@@ -2,6 +2,16 @@
 
 ## Unreleased — 0.3.0
 
+- Handle transient connection resets during live-service readiness checks within
+  a fixed deadline; retain strict health/analysis assertions after startup.
+- Add release gates/notes, local integration and live-HTTP smoke examples, explicit
+  security review/caveats, generated manual-QA EXIF fixtures, and a non-root Docker
+  image with an allowlisted build context and CI container build/runtime smoke job. Preserve pending visual
+  acceptance and deployment responsibilities instead of claiming production readiness.
+- Reduce full-image allocations for integer sharpness and diagnostic inputs while
+  preserving metric definitions and API contracts. Add opt-in guarded resource
+  profiling, measured 1080p–20MP/concurrent results, and cancellation/timeout
+  regression checks that retain active-worker slots until native work finishes.
 - Add a Quality Diagnostics panel to the existing selected-image page with
   measurements, evidence/warnings, suggestions and an editable opt-in JSON policy.
   Keep native sharpness units explicit, preserve strict policy JSON validation,

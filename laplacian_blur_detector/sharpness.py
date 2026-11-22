@@ -41,10 +41,14 @@ def _prepare_grayscale(image: np.ndarray) -> np.ndarray:
         raise ValueError(f"Could not convert image to grayscale: {error}") from error
     if gray.dtype not in (np.uint8, np.uint16, np.float32, np.float64):
         raise ValueError("Image dtype must be uint8, uint16, float32, or float64.")
-    if not np.isfinite(gray).all():
-        raise ValueError("Image values must be finite.")
-    # Float64 avoids unsigned overflow and permits floating-point derivative inputs.
-    return gray.astype(np.float64, copy=False)
+    if np.issubdtype(gray.dtype, np.floating):
+        if not np.isfinite(gray).all():
+            raise ValueError("Image values must be finite.")
+        # OpenCV's CV_64F derivatives support float64, not every float32 path.
+        return gray.astype(np.float64, copy=False)
+    # Preserve integer storage: CV_64F derivative outputs still avoid overflow.
+    # Integer values are always finite; no whole-image float64 copy is needed.
+    return gray
 
 
 def _response(gray: np.ndarray, metric: SharpnessMetric) -> np.ndarray:

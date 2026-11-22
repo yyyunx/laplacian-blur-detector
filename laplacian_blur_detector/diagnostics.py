@@ -101,14 +101,22 @@ def measure_image_quality(
     if scale == 1 and (not np.isfinite(channels).all() or channels.min() < 0 or channels.max() > 1):
         raise ValueError("Float diagnostic images must have finite non-alpha values in 0..1.")
     height, width = gray.shape
-    bright_pixels = np.any(channels >= cutoffs.bright_pixel_cutoff * scale, axis=2) if channels.ndim == 3 else channels >= cutoffs.bright_pixel_cutoff * scale
+    bright_limit = cutoffs.bright_pixel_cutoff * scale
+    if channels.ndim == 3:
+        bright_pixels = channels[:, :, 0] >= bright_limit
+        for channel in range(1, channels.shape[2]):
+            np.logical_or(bright_pixels, channels[:, :, channel] >= bright_limit, out=bright_pixels)
+    else:
+        bright_pixels = channels >= bright_limit
+    bright_ratio = float(np.count_nonzero(bright_pixels) / gray.size)
+    del bright_pixels  # Release the full-image mask before either derivative pass.
     texture_std = float(gray.std())
     return {
         "brightness": {"mean": float(gray.mean() / scale), "median": float(np.median(gray) / scale),
                        "unit": "normalized_encoded_grayscale"},
         "exposure": {
             "dark_pixel_ratio": float(np.count_nonzero(gray <= cutoffs.dark_pixel_cutoff * scale) / gray.size),
-            "bright_pixel_ratio": float(np.count_nonzero(bright_pixels) / gray.size),
+            "bright_pixel_ratio": bright_ratio,
             "dark_pixel_cutoff": cutoffs.dark_pixel_cutoff, "bright_pixel_cutoff": cutoffs.bright_pixel_cutoff,
             "bright_pixel_definition": "any_non_alpha_channel_at_or_above_cutoff",
         },

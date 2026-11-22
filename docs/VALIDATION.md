@@ -129,3 +129,10 @@ route retains the existing two-worker bound but has not been capacity-tuned.
 No dependencies or AI models were added. Synthetic datasets, full benchmark
 reports, build artifacts, virtual environments, and temporary files remain in
 ignored output/build/test directories.
+
+## Phase 5 acceptance update
+
+The bounded 2026-11-22 browser inventory attempt timed out before obtaining a
+surface. Actual browser acceptance remains pending. Follow the consolidated
+[desktop/mobile checklist](BROWSER_QA.md); generated fixtures and EXIF display
+references can be created without any private images. No screenshot is claimed.
