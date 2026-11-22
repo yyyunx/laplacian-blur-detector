@@ -2,6 +2,10 @@
 
 ## Unreleased — 0.3.0
 
+- Add independent NumPy/OpenCV image diagnostics for encoded brightness,
+  dark/bright pixel ratios, resolution, and existing native sharpness metrics.
+  Add explicit opt-in policy hints, native-scale checks, and low-texture
+  insufficient-evidence handling without an overall acceptance/rejection gate.
 - Extend the existing benchmark with Tenengrad and `--compare`, retaining default
   Laplacian behavior and existing prediction columns. Calibrate thresholds
   independently per metric/domain, infer supported frozen-policy metrics, and

@@ -163,6 +163,11 @@ benchmark policies, and `detect_blur()` decisions remain unchanged.
 
 ## Command line
 
+Image quality diagnostics are also available as an independent Python core:
+`measure_image_quality(image)` returns brightness, exposure, resolution and both
+sharpness metrics; `diagnose_image_quality(image, policy)` adds opt-in hints.
+Default warning rules are disabled. See [diagnostic policy and limitations](docs/DIAGNOSTICS.md).
+
 ```bash
 laplacian-blur sample.jpg --threshold 120
 laplacian-blur-evaluate ./samples --output ./outputs/blur_scores.csv
