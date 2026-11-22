@@ -21,6 +21,42 @@ jobs:
           test "$(docker exec sharpness-smoke id -u)" = 10001
       - name: Live HTTP contracts and bundled assets
         run: python tests/smoke_http.py
+      - name: Collect full-image vulnerability report (not release approval)
+        run: |
+          mkdir -p security-results
+          docker exec -i sharpness-smoke python - <<'PY' > security-results/python-installed.json
+          import importlib.metadata as metadata
+          import json
+          from pathlib import Path
+          import sysconfig
+          packages = sorted([{"name": d.metadata["Name"], "version": d.version} for d in metadata.distributions()], key=lambda d: d["name"].lower())
+          evidence = []
+          def matches(value):
+              if isinstance(value, dict):
+                  if str(value.get("name", "")).lower() == "setuptools":
+                      evidence.append({k: value.get(k) for k in ("name", "version", "type", "scope", "bom-ref")})
+                  for item in value.values():
+                      matches(item)
+              elif isinstance(value, list):
+                  for item in value:
+                      matches(item)
+          for path in Path(sysconfig.get_paths()["purelib"]).rglob("*.json"):
+              if "sbom" in str(path).lower() or ".cdx." in path.name.lower():
+                  before = len(evidence)
+                  matches(json.loads(path.read_text()))
+                  for item in evidence[before:]:
+                      item["source"] = str(path)
+          print(json.dumps({"installed": packages, "setuptools_sbom_components": evidence}, indent=2))
+          PY
+          docker run --rm --memory=2g --cpus=2 --pids-limit=128 --volume /var/run/docker.sock:/var/run/docker.sock --volume "$PWD/security-results:/reports" ghcr.io/aquasecurity/trivy:0.76.2 image --image-src docker --db-repository ghcr.io/aquasecurity/trivy-db:2 --scanners vuln --timeout 5m --format json --output /reports/container.json sharpness-smoke
+      - name: Retain vulnerability findings for release review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: container-security-results
+          path: security-results/*.json
+          if-no-files-found: warn
+          retention-days: 14
       - name: Container logs and cleanup
         if: always()
         run: |
