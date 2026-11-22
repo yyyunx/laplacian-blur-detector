@@ -2,6 +2,11 @@
 
 ## Unreleased — 0.3.0
 
+- Record Maintainer Manual Browser QA Passed (2026-11-23) for the explicitly
+  reported scope, with missing provenance/touch/keyboard evidence kept visible.
+  Document ordered merge-commit integration and experimental local-use release gates.
+- Exclude generated `examples/outputs` from source distributions and check both
+  archives after building with a generated-output sentinel present. Preserve local files.
 - Correct the Docker quickstart to bind loopback and use bounded, read-only,
   capability-free/no-new-privileges execution. Verify kernel controls and bounded
   image/XMP paths in CI without equating sample coverage with XML unreachability.

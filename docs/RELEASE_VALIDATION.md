@@ -1,6 +1,9 @@
 # Phase 5 validation record (2026-11-22)
 
 This records actual evidence and explicit limits, not publication approval.
+Current acceptance update (2026-11-23): the maintainer reported manual browser QA
+passed for the categories in [BROWSER_QA.md](BROWSER_QA.md). This is separate from
+the historical automated checks below; Codex did not perform that browser session.
 Phase 5 is based on `4388749`, with naming `5e34a61`, resources `0825628` and
 manual-QA record `c12103a`. Use the corresponding pushed commit's Actions run
 to identify the final candidate; no GitHub Release, tag or PyPI upload is created.
@@ -23,8 +26,9 @@ to identify the final candidate; no GitHub Release, tag or PyPI upload is create
 | New container gate | Added build, UID/read-only/resource-limited runtime and live HTTP smoke; the pushed candidate's Actions result is authoritative |
 | First container CI attempt | Run 44997317964 built/started non-root successfully but smoke hit a startup connection reset; readiness now retries transient connection errors within its fixed deadline, preserving response assertions |
 | Local Docker build | Not executed: Docker CLI 29.6.2 exists, Docker Desktop Linux daemon named pipe unavailable; CI provides the executable alternative |
-| Actual browser visual/input QA | NOT ACCEPTED: bounded inventory timed out before a surface was obtained; no screenshot; [manual steps](BROWSER_QA.md) |
-| Dedicated CVE/container vulnerability scan | Not performed; maintainer gate before release |
+| Manual browser QA update | Maintainer Manual Browser QA Passed, reported 2026-11-23; browser/build/screenshot/touch/keyboard evidence limits remain explicit |
+| Automated browser operation | Earlier binding timed out; no Codex browser acceptance or screenshot is claimed |
+| Dedicated CVE/container vulnerability scan | Completed in the 2026-11-22 follow-up; unresolved findings retained in [CONTAINER_TRIAGE.md](CONTAINER_TRIAGE.md), not a new scan today |
 
 Fresh environments were created with `venv`, without `--system-site-packages`,
 dependency `.pth` reuse or PYTHONPATH inheritance. Wheel and sdist used separate

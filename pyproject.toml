@@ -48,6 +48,7 @@ packages = ["laplacian_blur_detector"]
 "web/styles.css" = "laplacian_blur_detector/web/styles.css"
 
 [tool.hatch.build.targets.sdist]
+exclude = ["/examples/outputs/**"]
 include = [
   "/laplacian_blur_detector", "/web", "/api", "/src", "/scripts", "/tests",
   "/docs", "/examples", "/.github", "/*.md", "/LICENSE", "/pyproject.toml",

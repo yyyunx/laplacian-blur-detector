@@ -35,8 +35,9 @@ usability and resource handling, not established real-world classification accur
 - Separate low-texture hatching without a local blur classification.
 - Generated in-browser demo fixture and documented numeric/HTTP/controller tests.
 
-Visual QA on real desktop/mobile browser viewports remains pending because the
-browser automation tooling stopped during review; see [validation](VALIDATION.md).
+Maintainer Manual Browser QA Passed was reported on 2026-11-23 for the listed
+desktop/browser features and 390px layout; see [scope/evidence](BROWSER_QA.md).
+Browser version, exact build, physical touch and keyboard details were not supplied.
 Static illustrations are numeric outputs, not browser screenshots.
 
 ## Implemented: multi-metric experiments (Phase 3)
@@ -56,8 +57,8 @@ is deferred until evidence/texture rules and aggregation behavior are specified.
   resolution and existing sharpness, with configurable advisory hints in the core,
   independent API and existing image page. These are encoded-value proxies,
   not complete quality or sensor-clipping decisions.
-- Complete real desktop/mobile visual acceptance for both the heatmap and quality
-  panel; browser tooling remained unavailable during Phase 4 review.
+- Maintainer-reported visual acceptance now covers the heatmap and quality panel;
+  choose any supplemental provenance/touch/keyboard checks before publication.
 - Validate task-specific diagnostic policies on representative labeled images.
 - Keep sharpness results separate from other quality findings so API clients can
   choose which checks matter for documents, products, or another use case.
@@ -73,7 +74,7 @@ checks apply without needing a labeling workflow.
   integer grayscale copies. See [resource evidence](PERFORMANCE.md).
 - Added cancellation/timeout slot recovery checks, reproducible manual-QA fixtures,
   integration/HTTP smoke examples, non-root container and release/security records.
-- Complete [pending browser acceptance](BROWSER_QA.md), maintainer review and
+- Record [maintainer browser acceptance and evidence limits](BROWSER_QA.md), finish maintainer review and
   release-time dependency/image vulnerability scanning before formal publication.
 
 ## Next: deployment-specific operation

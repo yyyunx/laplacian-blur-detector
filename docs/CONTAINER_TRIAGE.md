@@ -5,14 +5,17 @@ Python inventory from Actions run 45000702006. Original artifact 14744839975 has
 SHA256 `ab02fafb0830cbf3c29519ec0ab2bf40aa05561f210ae808661c3d2396bf0ca0`.
 All findings remain visible. This is a bounded reachability review, not a claim
 that every advisory is exploitable or that all native decoder paths are proven safe.
+Acceptance update, 2026-11-23: [Maintainer Manual Browser QA Passed](BROWSER_QA.md)
+is recorded for the reported scope. This does not change the 2026-11-22 security
+snapshot or resolve its advisories; no fresh vulnerability scan is claimed here.
 
 ## Decision
 
 - **Controlled local-use pre-release: conditionally reasonable**, after review of
   this hardening fix, for trusted/self-created images, a supported patched host,
   loopback-only access and the documented memory/PID/read-only/no-privilege bounds.
-  Clearly retain the experimental label, outstanding advisories and pending real
-  desktop/mobile visual QA. This is not publication approval or a stable release.
+  Clearly retain the experimental label, outstanding advisories and the scope/
+  evidence limits of maintainer browser acceptance. This is not publication approval or a stable release.
 - **Public unauthenticated HTTP service: not recommended.** Untrusted native image
   decoding, uncertain XML/metadata reachability, no hard native-compute deadline
   and no per-client/connection limits remain. Put access control, request/rate

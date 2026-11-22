@@ -68,7 +68,7 @@ not a penetration test, a security guarantee, or public-deployment approval.
   findings before public deployment. Do not mix unstable repositories or add a
   vulnerable-component ignore rule solely to reduce counts.
 - Validation: inspect the latest full-image JSON and installed-package artifact.
-  Browser acceptance remains a separate open gate; green report-collection CI
+  Browser acceptance/evidence is separate from this finding; green report-collection CI
   does not constitute security approval.
 - Owner/target: release maintainer with distribution/vendor support, before release.
 
@@ -101,8 +101,10 @@ not a penetration test, a security guarantee, or public-deployment approval.
 ## SEC-003: Release evidence has open gates
 
 - Severity/status: Low for local development; open release gate.
-- Evidence/reproduction: [browser acceptance](docs/BROWSER_QA.md) is Pending,
-  dependency ranges are not frozen, and final CVE/image findings still require
+- Evidence/reproduction: [browser acceptance](docs/BROWSER_QA.md) is now
+  maintainer-reported Passed for the listed scope (2026-11-23), with provenance and
+  supplemental touch/keyboard evidence not supplied. Dependency ranges are not
+  frozen, and final CVE/image findings still require
   release-maintainer review. The earlier Phase 5 baseline had no dedicated scan;
   final follow-up evidence is attached to PR #3 and the dependent fix PR.
 - Impact: builds/tests do not establish visual/input acceptance or absence of
@@ -114,8 +116,9 @@ not a penetration test, a security guarantee, or public-deployment approval.
 
 ## Decision and rollback
 
-**BLOCKED for public production deployment/formal release due to unresolved
-image findings and pending browser acceptance.** Trusted loopback development
+**BLOCKED for public production deployment/stable release due to unresolved
+image findings and required maintainer risk/publication decisions.** Maintainer
+manual browser acceptance is recorded for its reported scope. Trusted loopback development
 can continue with the documented resource boundaries. See [caveats](SECURITY-CAVEATS.md).
 The [targeted container triage](docs/CONTAINER_TRIAGE.md) distinguishes a
 conditional trusted local-use experimental pre-release from public/stable hosting;

@@ -103,7 +103,10 @@ jobs:
       - name: Test
         run: python -m pytest -q
       - name: Build source and wheel distributions
-        run: python -m build
+        run: |
+          python -c "from pathlib import Path; p=Path('examples/outputs/packaging-sentinel.txt'); p.parent.mkdir(parents=True, exist_ok=True); p.write_text('Generated local output must not ship')"
+          python -m build
+          python tests/check_distribution_contents.py
       - name: Install wheel
         shell: pwsh
         run: |
