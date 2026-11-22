@@ -2,6 +2,9 @@
 
 ## Unreleased — 0.3.0
 
+- Add `/api/quality/diagnose` with bounded JSON policy parsing, shared image/resource
+  validation, EXIF-oriented measurements and actionable hints. Preserve every
+  existing endpoint contract, including blur responses and heatmap configuration.
 - Add independent NumPy/OpenCV image diagnostics for encoded brightness,
   dark/bright pixel ratios, resolution, and existing native sharpness metrics.
   Add explicit opt-in policy hints, native-scale checks, and low-texture

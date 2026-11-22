@@ -82,3 +82,29 @@ Low texture suppresses sharpness warnings in favor of insufficient evidence and
 an inspection suggestion; it does not suppress unrelated brightness/resolution
 hints. It never directly rejects an image. Grayscale std is a contrast proxy,
 not proof of useful texture.
+
+## Independent HTTP API
+
+`POST /api/quality/diagnose` accepts multipart `image` plus optional `policy`
+(a JSON object encoded as a string, default `{}`). A policy is capped at 8 KiB
+UTF-8; duplicate/unknown fields, malformed/deep JSON, booleans in numeric fields,
+and non-finite values are rejected. The complete resolved policy is returned.
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/quality/diagnose -F "image=@sample.jpg" -F 'policy={"min_width":640,"max_dark_ratio":0.5}'
+```
+
+The response includes the core report plus `success`, `filename`, `width`,
+`height`, `file_size`, `processing_ms`, and `coordinate_space` set to
+`exif_oriented_pixels`. JPEG/PNG EXIF orientation is applied before measurements,
+so minimum dimensions refer to the displayed orientation. No heatmap grid is
+required; tiny images can be measured and assessed against an explicit policy.
+
+The endpoint shares encoded-file, header/pixel, streaming-body limits, the worker
+thread pool, analysis semaphore, EXIF transform, and upload cleanup with existing
+analysis. Policy parsing happens before decode. Errors use the existing JSON
+`detail`/`error_code` shape: 400 `INVALID_DIAGNOSTIC_POLICY` or
+`INVALID_DIAGNOSTIC_INPUT` (including scale mismatch), 413
+`DIAGNOSTIC_POLICY_TOO_LARGE` or existing upload/pixel/request limits, and 503
+`SERVICE_BUSY` with `Retry-After: 1`. Missing multipart fields use 422.
+All existing endpoints, including configuration, retain their prior contracts.

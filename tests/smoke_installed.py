@@ -72,6 +72,12 @@ def main() -> None:
             )
             assert local.status_code == 200
             assert len(local.json()["cells"]) == 4
+            quality = client.post(
+                "/api/quality/diagnose", data={"policy": '{"min_width":64}'},
+                files={"image": ("sample.png", image.read_bytes(), "image/png")},
+            )
+            assert quality.status_code == 200
+            assert quality.json()["checks"]["resolution"]["status"] == "warning"
             batch = client.post("/api/blur/batch", files=[
                 ("images", ("sample.png", image.read_bytes(), "image/png")),
                 ("images", ("bad.png", b"invalid", "image/png")),

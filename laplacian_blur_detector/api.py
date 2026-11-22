@@ -2,6 +2,7 @@
 
 from contextlib import contextmanager
 from io import BytesIO
+import json
 from pathlib import Path
 from threading import BoundedSemaphore
 from time import perf_counter
@@ -19,7 +20,9 @@ from .config import (
     DEFAULT_BLUR_THRESHOLD, MAX_UPLOAD_BYTES, MAX_IMAGE_PIXELS, MAX_BATCH_FILES,
     MAX_BATCH_BYTES, MULTIPART_OVERHEAD_BYTES, MAX_CONCURRENT_ANALYSES,
     DEFAULT_LOCAL_GRID_SIZE, MAX_LOCAL_GRID_SIZE, MIN_LOCAL_CELL_SIZE,
+    MAX_DIAGNOSTIC_POLICY_BYTES,
 )
+from .diagnostics import DiagnosticPolicy, diagnose_image_quality
 from .evaluation import finite_nonnegative
 from .image_utils import decode_image_bytes
 from .request_limits import UploadBodyLimitMiddleware
@@ -37,6 +40,7 @@ app.add_middleware(UploadBodyLimitMiddleware, limits={
     "/api/blur/check": MAX_UPLOAD_BYTES + MULTIPART_OVERHEAD_BYTES,
     "/api/blur/batch": MAX_BATCH_BYTES + MULTIPART_OVERHEAD_BYTES,
     "/api/sharpness/local": MAX_UPLOAD_BYTES + MULTIPART_OVERHEAD_BYTES,
+    "/api/quality/diagnose": MAX_UPLOAD_BYTES + MULTIPART_OVERHEAD_BYTES,
 })
 _analysis_slots = BoundedSemaphore(MAX_CONCURRENT_ANALYSES)
 
@@ -209,6 +213,58 @@ async def local_sharpness(
             _analyze_local_bytes, data, image.filename or "uploaded-image.png",
             metric, grid_rows, grid_columns, cutoff,
         )
+    finally:
+        await image.close()
+
+
+def _parse_diagnostic_policy(value: str) -> DiagnosticPolicy:
+    def unique_fields(pairs):
+        result = {}
+        for key, item in pairs:
+            if key in result:
+                raise ValueError("Duplicate policy fields are not allowed.")
+            result[key] = item
+        return result
+
+    def finite_json(token):
+        raise ValueError("Non-finite JSON values are not allowed.")
+
+    try:
+        if len(value.encode("utf-8")) > MAX_DIAGNOSTIC_POLICY_BYTES:
+            raise UploadValidationError("Diagnostic policy exceeds the 8 KiB limit.", "DIAGNOSTIC_POLICY_TOO_LARGE", 413)
+        parsed = json.loads(value, object_pairs_hook=unique_fields, parse_constant=finite_json)
+        return DiagnosticPolicy.from_mapping(parsed)
+    except UploadValidationError:
+        raise
+    except (ValueError, TypeError, RecursionError, UnicodeError) as error:
+        # JSON-escaped surrogate keys must not turn a policy error into HTTP 500.
+        detail = str(error).encode("utf-8", "backslashreplace").decode("utf-8")
+        raise UploadValidationError("Invalid diagnostic policy: " + detail, "INVALID_DIAGNOSTIC_POLICY") from error
+
+
+def _analyze_quality_bytes(data: bytes, filename: str, policy: DiagnosticPolicy) -> dict:
+    started = perf_counter()
+    with _validated_analysis_image(data, filename) as image:
+        image = _display_oriented(image, data)
+        height, width = image.shape[:2]
+        try:
+            report = diagnose_image_quality(image, policy)
+        except ValueError as error:
+            raise UploadValidationError(str(error), "INVALID_DIAGNOSTIC_INPUT") from error
+        return {
+            "success": True, "filename": filename, "width": width, "height": height,
+            "file_size": len(data), "coordinate_space": "exif_oriented_pixels",
+            "processing_ms": round((perf_counter() - started) * 1000, 2), **report,
+        }
+
+
+@app.post("/api/quality/diagnose")
+async def quality_diagnostics(image: UploadFile = File(...), policy: str = Form("{}")) -> dict:
+    """Independent advisory diagnostics with bounded input and opt-in policy."""
+    try:
+        resolved = _parse_diagnostic_policy(policy)
+        data = await _read_upload(image)
+        return await run_in_threadpool(_analyze_quality_bytes, data, image.filename or "uploaded-image.png", resolved)
     finally:
         await image.close()
 
