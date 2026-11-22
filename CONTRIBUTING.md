@@ -17,7 +17,8 @@ python -m pytest -q
 ```
 
 With Node.js 22 or newer, run `node --test tests/web/*.test.mjs`,
-`node --check web/app.js`, and `node --check web/heatmap.js` for batch,
+`node --check web/app.js`, `node --check web/heatmap.js`, and
+`node --check web/quality-diagnostics.js` for batch,
 relative mapping, heatmap controller, and syntax checks.
 No npm runtime dependencies are needed by the browser tool.
 

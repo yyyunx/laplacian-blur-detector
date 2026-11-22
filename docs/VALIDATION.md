@@ -1,4 +1,8 @@
-# Development validation record
+# Phase 2–3 development validation record
+
+This historical record describes the Phase 2–3 baseline (`fd2d00c`). Phase 4
+diagnostic checks and the current manual acceptance list are documented in
+[DIAGNOSTICS.md](DIAGNOSTICS.md#phase-4-validation-and-manual-acceptance).
 
 Review date: 2026-11-22 (Asia/Taipei). Development uses incremental commits on
 `codex/sharpness-heatmap-benchmark`, with each tested milestone pushed and its

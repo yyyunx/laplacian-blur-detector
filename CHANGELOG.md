@@ -2,6 +2,11 @@
 
 ## Unreleased — 0.3.0
 
+- Add a Quality Diagnostics panel to the existing selected-image page with
+  measurements, evidence/warnings, suggestions and an editable opt-in JSON policy.
+  Keep native sharpness units explicit, preserve strict policy JSON validation,
+  and discard stale image/policy responses without changing the batch workflow.
+  Document manual visual acceptance limits; no real-image accuracy gain is claimed.
 - Add `/api/quality/diagnose` with bounded JSON policy parsing, shared image/resource
   validation, EXIF-oriented measurements and actionable hints. Preserve every
   existing endpoint contract, including blur responses and heatmap configuration.

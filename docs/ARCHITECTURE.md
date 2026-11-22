@@ -12,6 +12,7 @@ Metric comparison -----> same benchmark per metric -----> CSV/JSON/SVG + per-met
 Browser batch queue ---> bounded single-image API ------> header check + blur_detector
 Backend integration ---> bounded batch API -------------> ordered per-file results
 Selected-image map ----> bounded local API -------------> sharpness ---> SVG overlay
+Selected-image hints --> bounded diagnostic API --------> diagnostics + configured policy
 ```
 
 `laplacian_blur_detector` is the public Python namespace. Importing it loads the
@@ -106,3 +107,17 @@ records generation parameters and split-isolated capture groups; `demo.py` ties
 generation, numeric heatmap illustrations, and comparison together in one command.
 Synthetic conventions, human-labeled accuracy, and functional tests are distinct
 forms of evidence. No database, image persistence service, or AI model is added.
+
+## Quality diagnostics (Phase 4)
+
+`diagnostics.py` separates measurements from opt-in warnings. It normalizes encoded
+brightness/ratio/texture units by dtype, reuses both native sharpness metrics, and
+requires an intensity-scale pin for raw sharpness limits. Low texture yields
+insufficient evidence, not sharpness rejection. No aggregate acceptance gate exists.
+
+The independent quality route reuses the bounded upload reader, validated-image
+context, EXIF transform, worker pool and semaphore; bounded JSON policy validation
+precedes decode. `quality-diagnostics.js` manages only the selected image's hints,
+with independent cancellation/generation tracking and explicit uploads. It never
+changes heatmap state, batch thresholds, CLI or benchmark policies. The Web panel
+provides editable policy JSON and opt-in uncalibrated examples, not universal bounds.

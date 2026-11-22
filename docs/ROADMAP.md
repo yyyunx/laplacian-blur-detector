@@ -52,8 +52,13 @@ is deferred until evidence/texture rules and aggregation behavior are specified.
 
 ## Next: explain more image quality problems
 
-- Add brightness, clipped exposure, and minimum-resolution measurements.
-- Give specific suggestions based on detected problems rather than one generic rejection.
+- Phase 4 now measures mean/median brightness, dark/bright-channel ratios,
+  resolution and existing sharpness, with configurable advisory hints in the core,
+  independent API and existing image page. These are encoded-value proxies,
+  not complete quality or sensor-clipping decisions.
+- Complete real desktop/mobile visual acceptance for both the heatmap and quality
+  panel; browser tooling remained unavailable during Phase 4 review.
+- Validate task-specific diagnostic policies on representative labeled images.
 - Keep sharpness results separate from other quality findings so API clients can
   choose which checks matter for documents, products, or another use case.
 - Compare local sharpness and additional metrics on relevant samples before changing

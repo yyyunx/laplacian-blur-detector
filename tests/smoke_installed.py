@@ -58,7 +58,7 @@ def main() -> None:
         with TestClient(app) as client:
             assert client.get("/healthz").json() == {"status": "ok"}
             assert "Laplacian Blur Detector" in client.get("/").text
-            for asset in ("app.js", "batch-utils.js", "heatmap.js", "demo.png", "styles.css"):
+            for asset in ("app.js", "batch-utils.js", "heatmap.js", "quality-diagnostics.js", "demo.png", "styles.css"):
                 assert client.get(f"/static/{asset}").status_code == 200
             response = client.post(
                 "/api/blur/check",

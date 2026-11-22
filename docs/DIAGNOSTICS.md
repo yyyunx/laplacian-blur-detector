@@ -108,3 +108,62 @@ analysis. Policy parsing happens before decode. Errors use the existing JSON
 `DIAGNOSTIC_POLICY_TOO_LARGE` or existing upload/pixel/request limits, and 503
 `SERVICE_BUSY` with `Retry-After: 1`. Missing multipart fields use 422.
 All existing endpoints, including configuration, retain their prior contracts.
+
+## Web panel and local demo
+
+Run `laplacian-blur-serve` and open `http://127.0.0.1:8000`. Select **Try generated
+demo** (or your own JPG/PNG), then **Measure quality**. The existing Original and
+Heatmap views remain available for the same selected image; diagnostics has its
+own request and never changes the batch decision or CSV.
+
+The initial policy is `{}`: measurements with all warning rules disabled. Expand
+**Diagnostic policy** and select **Load example hints**, customize the JSON if
+needed, then measure again. This explicitly opts into uncalibrated example limits
+for mean brightness, pixel ratios, and 1024×768 resolution. The generated preview
+is 768×512, so it demonstrates a resolution warning and higher-resolution capture
+suggestion. **Measurements only** resets the policy. No sharpness acceptance
+threshold is preselected; use independently calibrated native limits if needed.
+
+The panel reports normalized mean/median, dark/bright ratios, displayed dimensions,
+both native sharpness scores, and normalized texture std. Very small nonzero values
+use scientific notation instead of appearing as zero. Definitions/limitations are
+collapsible. Warnings and insufficient evidence are distinct; no overall score or
+pass/fail badge is provided. Images upload only on an explicit measurement request.
+
+Policy edits, image changes, and clearing/removing a selection invalidate previous
+diagnostics and cancel pending work. Generation counters discard late responses
+even when abort is ignored. Batch work disables new diagnostic requests and aborts
+pending ones; already accepted server work can still finish under the shared limit.
+Errors/timeouts leave the original/heatmap workflow available and permit retry.
+
+## Phase 4 validation and manual acceptance
+
+Core/API/controller tests, builds and installed-wheel smoke checks are automated.
+The final local suite contains 209 Python tests and 21 frontend tests. Each Phase 4
+milestone runs the Windows/Ubuntu × Python 3.10/3.12/3.13 CI matrix before proceeding.
+No benchmark labels or data were changed and no accuracy gain is claimed.
+
+Actual browser QA remains **not completed**. On the Phase 4 review attempt,
+rebinding the existing localhost tab timed out after kernel reinitialization.
+Retries stopped; desktop/mobile rendering, pointer interactions and visual EXIF
+alignment must still be accepted manually. No browser screenshot is claimed.
+
+Manual checklist (retain the existing [heatmap checklist](VALIDATION.md#repeat-the-pending-visual-checks)):
+
+1. At desktop width (1280px) and phone width (390px), use **Try generated demo**.
+   Verify Original/Heatmap switching, both metrics, opacity 0/55/100 and cell hover,
+   tap/keyboard information, with no horizontal control overflow.
+2. Measure quality with `{}`: numeric measurements must appear, without universal
+   warning/pass rules. Load the example policy and measure again: dimensions
+   768×512 must trigger the explicitly configured 1024×768 resolution warning.
+3. On a dark image, enable mean/dark-ratio limits and inspect lighting suggestions;
+   on a white/saturated image enable bright-ratio hints. Do not interpret them as
+   proof of sensor clipping. On flat content, sharpness must be insufficient
+   evidence even with explicit sharpness limits, not directly rejected.
+4. Upload portrait/landscape and odd-size images plus EXIF rotations/mirrors.
+   Quality dimensions and heatmap coordinates must match the displayed orientation.
+5. Rapidly switch images, edit policy, clear the queue, and start/cancel/retry a
+   batch while requests are pending. Old hints/maps must never repaint a new
+   selection; quality settings must not change batch thresholds/counts/CSV.
+6. Enter invalid/duplicate JSON fields and wrong sharpness intensity scale. Verify
+   readable errors, cleared stale results and successful correction/retry.

@@ -43,6 +43,7 @@ packages = ["laplacian_blur_detector"]
 "web/app.js" = "laplacian_blur_detector/web/app.js"
 "web/batch-utils.js" = "laplacian_blur_detector/web/batch-utils.js"
 "web/heatmap.js" = "laplacian_blur_detector/web/heatmap.js"
+"web/quality-diagnostics.js" = "laplacian_blur_detector/web/quality-diagnostics.js"
 "web/demo.png" = "laplacian_blur_detector/web/demo.png"
 "web/styles.css" = "laplacian_blur_detector/web/styles.css"
 

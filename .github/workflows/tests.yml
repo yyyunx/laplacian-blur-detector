@@ -19,6 +19,7 @@ jobs:
         run: |
           node --check web/app.js
           node --check web/heatmap.js
+          node --check web/quality-diagnostics.js
           node --test tests/web/*.test.mjs
   test:
     runs-on: ${{ matrix.os }}
