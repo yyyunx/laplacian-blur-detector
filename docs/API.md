@@ -1,5 +1,9 @@
 # Core and local HTTP API reference
 
+The independent [quality diagnostics API](DIAGNOSTICS.md#independent-http-api)
+adds brightness/exposure/resolution measurements and opt-in hints without changing
+the sharpness/blur contracts below.
+
 Import the public functions from `laplacian_blur_detector`. The new measurements
 also live in `laplacian_blur_detector.sharpness`. Importing the core requires only
 NumPy and OpenCV; it does not require FastAPI, Uvicorn, Pillow, or browser code.

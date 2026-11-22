@@ -2,6 +2,18 @@
 
 ## Unreleased — 0.3.0
 
+- Add a Quality Diagnostics panel to the existing selected-image page with
+  measurements, evidence/warnings, suggestions and an editable opt-in JSON policy.
+  Keep native sharpness units explicit, preserve strict policy JSON validation,
+  and discard stale image/policy responses without changing the batch workflow.
+  Document manual visual acceptance limits; no real-image accuracy gain is claimed.
+- Add `/api/quality/diagnose` with bounded JSON policy parsing, shared image/resource
+  validation, EXIF-oriented measurements and actionable hints. Preserve every
+  existing endpoint contract, including blur responses and heatmap configuration.
+- Add independent NumPy/OpenCV image diagnostics for encoded brightness,
+  dark/bright pixel ratios, resolution, and existing native sharpness metrics.
+  Add explicit opt-in policy hints, native-scale checks, and low-texture
+  insufficient-evidence handling without an overall acceptance/rejection gate.
 - Extend the existing benchmark with Tenengrad and `--compare`, retaining default
   Laplacian behavior and existing prediction columns. Calibrate thresholds
   independently per metric/domain, infer supported frozen-policy metrics, and

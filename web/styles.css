@@ -231,6 +231,23 @@ progress::-webkit-progress-bar { background: var(--line); } progress::-webkit-pr
 .texture-key { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: .875rem; }
 .hatch-swatch { width: 25px; height: 18px; border: 1px solid var(--line); background: repeating-linear-gradient(135deg, #334155 0 6px, #f8fafc 6px 8px, #334155 8px 12px); }
 .cell-information { min-height: 5em; margin: 12px 0; padding: 12px; border-radius: 9px; background: var(--surface-raised); font-size: .875rem; line-height: 1.65; white-space: pre-line; overflow-wrap: anywhere; }
+.quality-panel { border-top: 1px solid var(--line); margin-top: 22px; padding-top: 20px; min-width: 0; }
+.quality-panel .panel-heading { flex-wrap: wrap; }
+.quality-panel h2 { font-size: 1.15rem; }
+.quality-panel h3 { margin-bottom: 8px; font-size: 1rem; }
+.quality-panel .hint, .quality-panel summary, .quality-panel label { font-size: .875rem; line-height: 1.6; }
+.quality-panel summary { cursor: pointer; color: var(--accent); }
+.quality-policy-details { margin: 14px 0; }
+.quality-policy-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 12px; }
+.quality-policy-details label { display: block; margin-bottom: 6px; }
+#quality-policy { width: 100%; max-width: 100%; min-width: 0; resize: vertical; padding: 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-raised); color: var(--text); font: .875rem/1.6 ui-monospace, monospace; }
+.quality-metrics { margin-top: 16px; }
+.quality-metrics article span { font-size: .875rem; line-height: 1.5; }
+.quality-metrics strong { font-size: 1.1rem; overflow-wrap: anywhere; }
+.quality-list { padding-left: 20px; font-size: .875rem; line-height: 1.65; }
+.quality-list li { margin-bottom: 10px; overflow-wrap: anywhere; }
+.quality-warning { color: #ffe38b; }
+.quality-information { color: #a9ccff; }
 
 @media (max-width: 768px) {
   .page-shell { padding-top: 25px; }

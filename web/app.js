@@ -1,7 +1,9 @@
 import { resultStatus, resultsCsv, sortResults } from "./batch-utils.js";
 import { mountHeatmap } from "./heatmap.js";
+import { mountQualityDiagnostics } from "./quality-diagnostics.js";
 
 const localHeatmap = mountHeatmap();
+const qualityDiagnostics = mountQualityDiagnostics();
 
 const get = (id) => {
   const element = document.getElementById(id);
@@ -68,6 +70,7 @@ function selectItem(id) {
   const item = items.find((entry) => entry.id === id);
   const canPreview = item?.valid && item.errorCode !== "IMAGE_TOO_LARGE";
   localHeatmap.setFile(canPreview ? item.file : null);
+  qualityDiagnostics.setFile(canPreview ? item.file : null);
   ui.previewWrap.hidden = !canPreview;
   ui.drop.hidden = !!canPreview;
   if (canPreview) {
@@ -136,6 +139,7 @@ function renderDetail() {
 }
 function renderQueue() {
   localHeatmap.setBatchBusy(running);
+  qualityDiagnostics.setBatchBusy(running);
   ui.demo.disabled = running || demoLoading || items.length >= limits.max_batch_files;
   const counts = { clear: 0, blurry: 0, error: 0, pending: 0, analyzing: 0 };
   for (const item of items) counts[resultStatus(item)]++;
@@ -250,6 +254,7 @@ async function analyze(retryOnly = false) {
         item.errorCode = timedOut ? "TIMEOUT" : error.code || "ANALYSIS_FAILED";
         if (item.errorCode === "IMAGE_TOO_LARGE" && item.id === selectedId) {
           localHeatmap.setFile(null);
+          qualityDiagnostics.setFile(null);
           releasePreview(); ui.previewWrap.hidden = true; ui.drop.hidden = false;
         }
       } finally {
@@ -311,8 +316,8 @@ for (const eventName of ["dragleave", "drop"]) {
 ui.surface.addEventListener("drop", (event) => { event.stopPropagation(); addFiles(event.dataTransfer.files); });
 window.addEventListener("dragover", (event) => event.preventDefault());
 window.addEventListener("drop", (event) => event.preventDefault());
-window.addEventListener("beforeunload", () => { releasePreview(); activeController?.abort(); localHeatmap.destroy(); });
-ui.preview.addEventListener("error", () => { ui.previewWrap.hidden = true; ui.drop.hidden = false; localHeatmap.setFile(null); });
+window.addEventListener("beforeunload", () => { releasePreview(); activeController?.abort(); localHeatmap.destroy(); qualityDiagnostics.destroy(); });
+ui.preview.addEventListener("error", () => { ui.previewWrap.hidden = true; ui.drop.hidden = false; localHeatmap.setFile(null); qualityDiagnostics.setFile(null); });
 renderQueue();
 fetch("/api/config").then((response) => {
   if (!response.ok) throw new Error("Unavailable");

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="Check image sharpness in batches, compare results, and export a report." />
     <title>Laplacian Blur Detector</title>
-    <link rel="stylesheet" href="/static/styles.css?v=heatmap-v1" />
+    <link rel="stylesheet" href="/static/styles.css?v=quality-v1" />
   </head>
   <body>
     <main class="page-shell">
@@ -104,6 +104,30 @@
               </div>
             </div>
           </section>
+          <section class="quality-panel" aria-labelledby="quality-title">
+            <div class="panel-heading"><h2 id="quality-title">Quality diagnostics</h2>
+              <button id="quality-run" class="secondary-button" type="button" disabled>Measure quality</button>
+            </div>
+            <p id="quality-status" class="hint" role="status">Select an image, then measure quality.</p>
+            <details class="quality-policy-details">
+              <summary>Diagnostic policy</summary>
+              <p class="hint">Default: measurements only. Example hints are uncalibrated; customize limits for your task. No universal acceptance threshold is provided.</p>
+              <div class="quality-policy-actions">
+                <button id="quality-example" type="button" class="secondary-button">Load example hints</button>
+                <button id="quality-reset" type="button" class="text-button">Measurements only</button>
+              </div>
+              <label for="quality-policy">Policy JSON (optional rules; 8 KiB limit)</label>
+              <textarea id="quality-policy" rows="7" maxlength="8192" spellcheck="false" aria-describedby="quality-policy-help">{}</textarea>
+              <p id="quality-policy-help" class="hint">Brightness/ratio limits use 0–1. Sharpness limits are metric-specific native scores and require sharpness_intensity_max (1, 255 or 65535). Changes apply after measuring again.</p>
+            </details>
+            <div id="quality-results" hidden>
+              <div id="quality-metrics" class="metrics-grid quality-metrics"></div>
+              <p id="quality-summary" class="hint"></p>
+              <h3>Warnings and evidence</h3><ul id="quality-warnings" class="quality-list"></ul>
+              <h3>Improvement suggestions</h3><ul id="quality-suggestions" class="quality-list"></ul>
+              <details><summary>Definitions and limitations</summary><ul id="quality-definitions" class="quality-list"></ul></details>
+            </div>
+          </section>
         </section>
       </section>
 
@@ -137,6 +161,6 @@
       </details>
     </main>
     <footer>Traditional computer-vision metric · No images retained after analysis</footer>
-    <script type="module" src="/static/app.js?v=heatmap-v1"></script>
+    <script type="module" src="/static/app.js?v=quality-v1"></script>
   </body>
 </html>

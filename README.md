@@ -12,6 +12,9 @@ Laplacian variance, Tenengrad, and local grid sharpness with an interactive rela
 heatmap. The benchmark can compare metrics using independent thresholds. The
 single-image CLI, batch decisions, and default benchmark retain the original
 Laplacian variance calculation.
+Optional quality diagnostics add encoded brightness, exposure ratios, resolution,
+and configurable improvement hints. They do not accept/reject images or replace
+the existing batch threshold decisions.
 It is not a learned model or a complete image quality assessment. Use the browser
 tool, CLI, or API directly; accounts and manually labeled datasets are not required.
 
@@ -32,6 +35,10 @@ calibration/test captures, frozen per-metric policies, original/heatmap PNGs, an
 `comparison/comparison.csv`, `comparison.json`, and `metric-comparison.svg`.
 Open the SVG to compare held-out metrics and single-pass latency. Choose a new
 output directory for another run; existing artifacts are preserved.
+
+Select **Measure quality** for brightness/exposure/resolution and both sharpness
+metrics. Under **Diagnostic policy**, explicitly load uncalibrated example hints
+or edit your own bounds, then measure again. Defaults provide measurements only.
 
 | Original | Relative Laplacian | Relative Tenengrad |
 | --- | --- | --- |
@@ -160,6 +167,25 @@ on representative images.
 The core requires only NumPy/OpenCV. See the [API reference](docs/API.md) for signatures, supported
 arrays, output fields, and error behavior. Existing HTTP fields, CLI output,
 benchmark policies, and `detect_blur()` decisions remain unchanged.
+
+## Image quality diagnostics
+
+Image quality diagnostics are available as an independent Python core:
+`measure_image_quality(image)` returns brightness, exposure, resolution and both
+sharpness metrics; `diagnose_image_quality(image, policy)` adds opt-in hints.
+Default warning rules are disabled. See [diagnostic policy and limitations](docs/DIAGNOSTICS.md).
+
+The same image page includes a **Quality diagnostics** panel with numeric
+measurements, warnings/evidence, improvement suggestions and definitions. Low
+texture is insufficient evidence, not a rejection. The example policy is
+explicitly uncalibrated; it uses 1024×768 as an illustrative minimum, so the
+768×512 generated preview demonstrates a resolution hint. Use task-specific
+bounds rather than treating this example as a universal quality rule.
+
+`POST /api/quality/diagnose` accepts `image` plus an optional JSON `policy` form
+field. It shares existing validation/resource limits and applies EXIF orientation
+before resolution checks. Other API, CLI, benchmark, heatmap and batch behavior
+remain compatible. No real-image accuracy improvement is claimed.
 
 ## Command line
 

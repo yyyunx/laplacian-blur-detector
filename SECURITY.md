@@ -25,6 +25,9 @@ There is no guaranteed response time or maintained LTS branch at this stage.
 - Local sharpness uses the same upload/header/decode/worker controls, with at most
   32×32 cells and a minimum cell size of 16×16 pixels to bound response size.
   These spatial bounds do not replace process memory limits for derivative arrays.
+- Quality diagnostics shares the same image/worker controls. JSON policy is capped
+  at 8 KiB and rejects duplicate/unknown fields and invalid numeric values before
+  decoding. Diagnostic hints do not alter the existing upload acceptance decisions.
 - No persistent image/result storage. Multipart parsing can temporarily spool
   uploads to local disk; deployment operators control that temporary filesystem.
 
