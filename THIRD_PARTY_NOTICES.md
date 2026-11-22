@@ -6,7 +6,7 @@ The original source code of this repository is licensed under the MIT License. T
 
 ## OpenCV / opencv-python
 
-**Purpose:** Image processing, grayscale conversion, Laplacian filtering, and variance-based image sharpness analysis.
+**Purpose:** Image processing, grayscale conversion, Laplacian/Sobel sharpness measurements, synthetic experiment generation, and numeric heatmap rendering.
 
 * OpenCV: Apache License 2.0
 * opencv-python packaging scripts: MIT License

@@ -1,4 +1,7 @@
 import { resultStatus, resultsCsv, sortResults } from "./batch-utils.js";
+import { mountHeatmap } from "./heatmap.js";
+
+const localHeatmap = mountHeatmap();
 
 const get = (id) => {
   const element = document.getElementById(id);
@@ -20,12 +23,14 @@ const ui = {
   total: get("count-total"), clearCount: get("count-clear"), blurryCount: get("count-blurry"),
   errorCount: get("count-error"), progress: get("analysis-progress"), progressLabel: get("progress-label"),
   filter: get("status-filter"), sort: get("sort-order"), rows: get("batch-results"),
+  demo: get("demo-button"),
 };
 let items = [];
 let selectedId = null;
 let nextId = 0;
 let previewUrl = null;
 let running = false;
+let demoLoading = false;
 let cancelRequested = false;
 let activeController = null;
 let runMessage = "";
@@ -62,6 +67,7 @@ function selectItem(id) {
   releasePreview();
   const item = items.find((entry) => entry.id === id);
   const canPreview = item?.valid && item.errorCode !== "IMAGE_TOO_LARGE";
+  localHeatmap.setFile(canPreview ? item.file : null);
   ui.previewWrap.hidden = !canPreview;
   ui.drop.hidden = !!canPreview;
   if (canPreview) {
@@ -129,6 +135,8 @@ function renderDetail() {
   ui.details.hidden = false;
 }
 function renderQueue() {
+  localHeatmap.setBatchBusy(running);
+  ui.demo.disabled = running || demoLoading || items.length >= limits.max_batch_files;
   const counts = { clear: 0, blurry: 0, error: 0, pending: 0, analyzing: 0 };
   for (const item of items) counts[resultStatus(item)]++;
   ui.total.textContent = String(items.length);
@@ -241,6 +249,7 @@ async function analyze(retryOnly = false) {
         item.error = timedOut ? "Analysis timed out after 30 seconds. Please retry." : error.message || "Could not reach the service. Please retry.";
         item.errorCode = timedOut ? "TIMEOUT" : error.code || "ANALYSIS_FAILED";
         if (item.errorCode === "IMAGE_TOO_LARGE" && item.id === selectedId) {
+          localHeatmap.setFile(null);
           releasePreview(); ui.previewWrap.hidden = true; ui.drop.hidden = false;
         }
       } finally {
@@ -255,6 +264,18 @@ async function analyze(retryOnly = false) {
 }
 
 ui.input.addEventListener("change", () => addFiles(ui.input.files));
+ui.demo.addEventListener("click", async () => {
+  if (running || demoLoading) return;
+  demoLoading = true; renderQueue();
+  try {
+    const response = await fetch("/static/demo.png");
+    if (!response.ok) throw new Error("Could not load the generated demo image.");
+    const file = new File([await response.blob()], "sharpness-demo.png", { type: "image/png" });
+    if (running) return;
+    addFiles([file]); selectItem(items[items.length - 1].id);
+  } catch (error) { showMessage(error.message); }
+  finally { demoLoading = false; renderQueue(); }
+});
 ui.add.addEventListener("click", () => ui.input.click());
 ui.drop.addEventListener("keydown", (event) => {
   if (event.key === "Enter" || event.key === " ") { event.preventDefault(); if (!running) ui.input.click(); }
@@ -290,8 +311,8 @@ for (const eventName of ["dragleave", "drop"]) {
 ui.surface.addEventListener("drop", (event) => { event.stopPropagation(); addFiles(event.dataTransfer.files); });
 window.addEventListener("dragover", (event) => event.preventDefault());
 window.addEventListener("drop", (event) => event.preventDefault());
-window.addEventListener("beforeunload", () => { releasePreview(); activeController?.abort(); });
-ui.preview.addEventListener("error", () => { ui.previewWrap.hidden = true; ui.drop.hidden = false; });
+window.addEventListener("beforeunload", () => { releasePreview(); activeController?.abort(); localHeatmap.destroy(); });
+ui.preview.addEventListener("error", () => { ui.previewWrap.hidden = true; ui.drop.hidden = false; localHeatmap.setFile(null); });
 renderQueue();
 fetch("/api/config").then((response) => {
   if (!response.ok) throw new Error("Unavailable");

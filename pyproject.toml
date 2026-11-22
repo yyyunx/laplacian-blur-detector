@@ -25,6 +25,7 @@ dev = ["pytest>=8", "httpx>=0.27", "ruff>=0.9", "build>=1.2"]
 laplacian-blur = "laplacian_blur_detector.cli:main"
 laplacian-blur-evaluate = "laplacian_blur_detector.evaluate:main"
 laplacian-blur-benchmark = "laplacian_blur_detector.benchmark:main"
+laplacian-blur-demo = "laplacian_blur_detector.demo:main"
 laplacian-blur-serve = "laplacian_blur_detector.server:main"
 
 [project.urls]
@@ -41,6 +42,8 @@ packages = ["laplacian_blur_detector"]
 "web/index.html" = "laplacian_blur_detector/web/index.html"
 "web/app.js" = "laplacian_blur_detector/web/app.js"
 "web/batch-utils.js" = "laplacian_blur_detector/web/batch-utils.js"
+"web/heatmap.js" = "laplacian_blur_detector/web/heatmap.js"
+"web/demo.png" = "laplacian_blur_detector/web/demo.png"
 "web/styles.css" = "laplacian_blur_detector/web/styles.css"
 
 [tool.hatch.build.targets.sdist]

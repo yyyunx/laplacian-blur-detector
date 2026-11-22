@@ -53,10 +53,12 @@ def main() -> None:
         )
         run_command("laplacian-blur-benchmark", str(manifest), "--output", str(root / "benchmark"))
         assert (root / "benchmark" / "summary.json").is_file()
+        run_command("laplacian-blur-demo", "--output", str(root / "demo"), "--samples-per-case", "1")
+        assert (root / "demo" / "comparison" / "comparison.csv").is_file()
         with TestClient(app) as client:
             assert client.get("/healthz").json() == {"status": "ok"}
             assert "Laplacian Blur Detector" in client.get("/").text
-            for asset in ("app.js", "batch-utils.js", "styles.css"):
+            for asset in ("app.js", "batch-utils.js", "heatmap.js", "demo.png", "styles.css"):
                 assert client.get(f"/static/{asset}").status_code == 200
             response = client.post(
                 "/api/blur/check",
@@ -64,6 +66,12 @@ def main() -> None:
             )
             assert response.status_code == 200
             assert response.json()["is_blurry"] is True
+            local = client.post(
+                "/api/sharpness/local", data={"grid_rows": 2, "grid_columns": 2, "metric": "tenengrad"},
+                files={"image": ("sample.png", image.read_bytes(), "image/png")},
+            )
+            assert local.status_code == 200
+            assert len(local.json()["cells"]) == 4
             batch = client.post("/api/blur/batch", files=[
                 ("images", ("sample.png", image.read_bytes(), "image/png")),
                 ("images", ("bad.png", b"invalid", "image/png")),

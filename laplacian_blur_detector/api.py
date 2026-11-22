@@ -1,10 +1,13 @@
 """Bounded HTTP image analysis with single-image and batch interfaces."""
 
+from contextlib import contextmanager
+from io import BytesIO
 from pathlib import Path
 from threading import BoundedSemaphore
 from time import perf_counter
 
 import cv2
+from PIL import Image
 from fastapi import FastAPI, File, Form, Request, UploadFile
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
@@ -15,10 +18,12 @@ from .blur_detector import detect_blur
 from .config import (
     DEFAULT_BLUR_THRESHOLD, MAX_UPLOAD_BYTES, MAX_IMAGE_PIXELS, MAX_BATCH_FILES,
     MAX_BATCH_BYTES, MULTIPART_OVERHEAD_BYTES, MAX_CONCURRENT_ANALYSES,
+    DEFAULT_LOCAL_GRID_SIZE, MAX_LOCAL_GRID_SIZE, MIN_LOCAL_CELL_SIZE,
 )
 from .evaluation import finite_nonnegative
 from .image_utils import decode_image_bytes
 from .request_limits import UploadBodyLimitMiddleware
+from .sharpness import analyze_local_sharpness
 from .upload_validation import UploadValidationError, validate_header
 
 PACKAGE_ROOT = Path(__file__).resolve().parent
@@ -31,6 +36,7 @@ app.mount("/static", StaticFiles(directory=WEB_DIRECTORY), name="static")
 app.add_middleware(UploadBodyLimitMiddleware, limits={
     "/api/blur/check": MAX_UPLOAD_BYTES + MULTIPART_OVERHEAD_BYTES,
     "/api/blur/batch": MAX_BATCH_BYTES + MULTIPART_OVERHEAD_BYTES,
+    "/api/sharpness/local": MAX_UPLOAD_BYTES + MULTIPART_OVERHEAD_BYTES,
 })
 _analysis_slots = BoundedSemaphore(MAX_CONCURRENT_ANALYSES)
 
@@ -64,6 +70,12 @@ def public_config() -> dict:
         "max_batch_files": MAX_BATCH_FILES,
         "max_batch_bytes": MAX_BATCH_BYTES,
         "supported_extensions": [".jpg", ".jpeg", ".png"],
+        "local_sharpness": {
+            "default_grid_size": DEFAULT_LOCAL_GRID_SIZE,
+            "max_grid_size": MAX_LOCAL_GRID_SIZE,
+            "max_cells": MAX_LOCAL_GRID_SIZE**2,
+            "min_cell_size": MIN_LOCAL_CELL_SIZE,
+        },
     }
 
 
@@ -74,22 +86,32 @@ def _resolve_threshold(threshold: float) -> float:
         raise UploadValidationError("Threshold must be a finite non-negative number.", "INVALID_THRESHOLD") from error
 
 
-def _analyze_bytes(data: bytes, filename: str, threshold: float) -> dict:
+@contextmanager
+def _validated_analysis_image(data: bytes, filename: str):
+    """Share header/decode limits and hold the same slot through all analysis."""
     if not _analysis_slots.acquire(blocking=False):
         raise UploadValidationError("The service is busy. Please retry shortly.", "SERVICE_BUSY", 503)
     try:
-        started = perf_counter()
         validate_header(data, filename, MAX_IMAGE_PIXELS)
         try:
             image = decode_image_bytes(data, filename)
             height, width = image.shape[:2]
             if width * height > MAX_IMAGE_PIXELS:
                 raise UploadValidationError("Image dimensions are too large. Resize it before uploading.", "IMAGE_TOO_LARGE", 413)
-            result = detect_blur(image, threshold)
+            yield image
         except UploadValidationError:
             raise
         except (ValueError, cv2.error) as error:
             raise UploadValidationError("Could not analyze uploaded image. Use a valid JPG, JPEG, or PNG.") from error
+    finally:
+        _analysis_slots.release()
+
+
+def _analyze_bytes(data: bytes, filename: str, threshold: float) -> dict:
+    started = perf_counter()
+    with _validated_analysis_image(data, filename) as image:
+        height, width = image.shape[:2]
+        result = detect_blur(image, threshold)
         return {
             "success": True,
             "filename": filename,
@@ -103,18 +125,92 @@ def _analyze_bytes(data: bytes, filename: str, threshold: float) -> dict:
                 if result["is_blurry"] else "Image passes the sharpness threshold."
             ),
         }
-    finally:
-        _analysis_slots.release()
 
 
-async def _analyze_upload(image: UploadFile, threshold: float) -> dict:
+async def _read_upload(image: UploadFile) -> bytes:
     data = await image.read(MAX_UPLOAD_BYTES + 1)
     if len(data) > MAX_UPLOAD_BYTES:
         raise UploadValidationError(
             f"Image exceeds the {MAX_UPLOAD_BYTES // (1024 * 1024)} MiB upload limit.",
             "FILE_TOO_LARGE", 413,
         )
+    return data
+
+
+async def _analyze_upload(image: UploadFile, threshold: float) -> dict:
+    data = await _read_upload(image)
     return await run_in_threadpool(_analyze_bytes, data, image.filename or "uploaded-image.png", threshold)
+
+
+def _display_oriented(image, data: bytes):
+    """Match browser EXIF orientation for heatmap coordinates, including mirrors."""
+    try:
+        with Image.open(BytesIO(data)) as header:
+            orientation = header.getexif().get(274, 1)
+    except (OSError, SyntaxError, ValueError) as error:
+        raise UploadValidationError("Could not read image orientation metadata.") from error
+    if orientation == 2:
+        return cv2.flip(image, 1)
+    if orientation == 3:
+        return cv2.rotate(image, cv2.ROTATE_180)
+    if orientation == 4:
+        return cv2.flip(image, 0)
+    if orientation == 5:
+        return cv2.transpose(image)
+    if orientation == 6:
+        return cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
+    if orientation == 7:
+        return cv2.flip(cv2.transpose(image), -1)
+    if orientation == 8:
+        return cv2.rotate(image, cv2.ROTATE_90_COUNTERCLOCKWISE)
+    return image
+
+
+def _analyze_local_bytes(data: bytes, filename: str, metric: str, rows: int, columns: int, texture_cutoff: float) -> dict:
+    started = perf_counter()
+    with _validated_analysis_image(data, filename) as image:
+        image = _display_oriented(image, data)
+        height, width = image.shape[:2]
+        if height // rows < MIN_LOCAL_CELL_SIZE or width // columns < MIN_LOCAL_CELL_SIZE:
+            raise UploadValidationError(
+                f"Each cell must be at least {MIN_LOCAL_CELL_SIZE} x {MIN_LOCAL_CELL_SIZE} pixels. Choose a smaller grid.",
+                "GRID_TOO_FINE",
+            )
+        cells = analyze_local_sharpness(image, (rows, columns), metric, min_texture_std=texture_cutoff)
+        return {
+            "success": True, "filename": filename, "width": width, "height": height,
+            "file_size": len(data), "metric": metric,
+            "grid_rows": rows, "grid_columns": columns, "min_texture_std": texture_cutoff,
+            "coordinate_space": "exif_oriented_pixels", "cells": cells,
+            "processing_ms": round((perf_counter() - started) * 1000, 2),
+        }
+
+
+@app.post("/api/sharpness/local")
+async def local_sharpness(
+    image: UploadFile = File(...),
+    metric: str = Form("laplacian"),
+    grid_rows: int = Form(DEFAULT_LOCAL_GRID_SIZE),
+    grid_columns: int = Form(DEFAULT_LOCAL_GRID_SIZE),
+    min_texture_std: float = Form(5.0),
+) -> dict:
+    """Return local measurements, not blur labels or cross-image normalized scores."""
+    try:
+        if metric not in ("laplacian", "tenengrad"):
+            raise UploadValidationError("Metric must be 'laplacian' or 'tenengrad'.", "INVALID_METRIC")
+        if not (1 <= grid_rows <= MAX_LOCAL_GRID_SIZE and 1 <= grid_columns <= MAX_LOCAL_GRID_SIZE):
+            raise UploadValidationError(f"Grid rows and columns must be between 1 and {MAX_LOCAL_GRID_SIZE}.", "INVALID_GRID")
+        try:
+            cutoff = finite_nonnegative(min_texture_std)
+        except ValueError as error:
+            raise UploadValidationError("Texture cutoff must be finite and non-negative.", "INVALID_TEXTURE_CUTOFF") from error
+        data = await _read_upload(image)
+        return await run_in_threadpool(
+            _analyze_local_bytes, data, image.filename or "uploaded-image.png",
+            metric, grid_rows, grid_columns, cutoff,
+        )
+    finally:
+        await image.close()
 
 
 @app.post("/api/blur/check")

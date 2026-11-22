@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 328" role="img" aria-labelledby="title desc">
+<title id="title">Held-out metric comparison</title>
+<desc id="desc">Balanced accuracy and mean processing latency with metric-specific thresholds. Synthetic results are not real-world accuracy.</desc>
+<rect width="1000" height="328" fill="#0b1120"/>
+<g font-family="sans-serif" fill="#f3f7ff">
+<text x="28" y="35" font-size="24">Held-out metric comparison</text>
+<text x="28" y="60" font-size="14" fill="#aabbd2">Independent thresholds · retake = positive · same manifest and splits</text>
+<text x="320" y="91" font-size="14">Balanced accuracy (0–1)</text>
+<text x="680" y="91" font-size="14">Mean decode + metric latency (ms)</text>
+<text x="28" y="120" font-size="16">laplacian / synthetic</text>
+<text x="28" y="143" font-size="13" fill="#aabbd2">threshold 2751.72 · n=24</text>
+<rect x="320" y="105" width="260" height="20" fill="#24334b" rx="3"/>
+<rect x="680" y="105" width="220" height="20" fill="#24334b" rx="3"/>
+<rect x="680" y="105" width="220.000" height="20" fill="#71b7ff" rx="3"/>
+<text x="910" y="120" font-size="14">3.225</text>
+<rect x="320" y="105" width="113.750" height="20" fill="#72d3b2" rx="3"/>
+<text x="590" y="120" font-size="14">0.438</text>
+<text x="28" y="215" font-size="16">tenengrad / synthetic</text>
+<text x="28" y="238" font-size="13" fill="#aabbd2">threshold 26941.4 · n=24</text>
+<rect x="320" y="200" width="260" height="20" fill="#24334b" rx="3"/>
+<rect x="680" y="200" width="220" height="20" fill="#24334b" rx="3"/>
+<rect x="680" y="200" width="190.892" height="20" fill="#71b7ff" rx="3"/>
+<text x="910" y="215" font-size="14">2.798</text>
+<rect x="320" y="200" width="130.000" height="20" fill="#72d3b2" rx="3"/>
+<text x="590" y="215" font-size="14">0.500</text>
+<text x="28" y="308" font-size="13" fill="#aabbd2">Synthetic experiments are not real-world validation. Latency varies with hardware and load; see comparison.json.</text>
+</g></svg>

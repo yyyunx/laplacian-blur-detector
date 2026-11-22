@@ -22,6 +22,9 @@ There is no guaranteed response time or maintained LTS branch at this stage.
 - Pillow checks supported content and a 20-million-pixel limit before OpenCV decode.
 - Worker-thread processing admits two active analyses per server process; busy
   requests receive a retryable 503. A batch is processed serially within its request.
+- Local sharpness uses the same upload/header/decode/worker controls, with at most
+  32×32 cells and a minimum cell size of 16×16 pixels to bound response size.
+  These spatial bounds do not replace process memory limits for derivative arrays.
 - No persistent image/result storage. Multipart parsing can temporarily spool
   uploads to local disk; deployment operators control that temporary filesystem.
 

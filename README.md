@@ -7,9 +7,42 @@ The project is an open-source image quality toolkit that others can use, integra
 and contribute to. Vehicle photos are one use case alongside document capture,
 product photography, and other image upload workflows.
 
-**Current status: early-stage, stateless toolkit.** It computes Laplacian variance;
-it is not a learned model or a complete image quality assessment. Use the browser
+**Current status: early-stage, stateless toolkit.** The Python core measures
+Laplacian variance, Tenengrad, and local grid sharpness with an interactive relative
+heatmap. The benchmark can compare metrics using independent thresholds. The
+single-image CLI, batch decisions, and default benchmark retain the original
+Laplacian variance calculation.
+It is not a learned model or a complete image quality assessment. Use the browser
 tool, CLI, or API directly; accounts and manually labeled datasets are not required.
+
+## Five-minute quick start
+
+From an activated Python 3.10+ environment in this checkout:
+
+```bash
+python -m pip install -e ".[server]"
+laplacian-blur-demo --output outputs/my-first-demo
+laplacian-blur-serve
+```
+
+Open [the local tool](http://127.0.0.1:8000), select **Try generated demo**, then
+**Heatmap**. Switch metrics, adjust opacity, and inspect regions. Batch decisions
+remain independent. The demo command writes six synthetic stress cases, separate
+calibration/test captures, frozen per-metric policies, original/heatmap PNGs, and
+`comparison/comparison.csv`, `comparison.json`, and `metric-comparison.svg`.
+Open the SVG to compare held-out metrics and single-pass latency. Choose a new
+output directory for another run; existing artifacts are preserved.
+
+| Original | Relative Laplacian | Relative Tenengrad |
+| --- | --- | --- |
+| ![Generated crisp, softened, and flat content](docs/images/demo-original.png) | ![Static relative Laplacian illustration](docs/images/demo-laplacian.png) | ![Static relative Tenengrad illustration](docs/images/demo-tenengrad.png) |
+
+These are static outputs from the numeric core, **not browser screenshots**.
+Hatching identifies low texture. See the [recorded synthetic experiment](docs/EXPERIMENTS.md)
+for the actual comparison chart, measured results, and failure cases, and the
+[validation record](docs/VALIDATION.md) for checks performed and browser limitations.
+Synthetic labels are generation rules, not human judgments or evidence of
+real-world accuracy. No trained model or real-image accuracy improvement is claimed.
 
 ## Choose how to use it
 
@@ -19,6 +52,7 @@ tool, CLI, or API directly; accounts and manually labeled datasets are not requi
 | Single-image CLI | Checking an image locally |
 | Dataset CLI with CSV | Inspecting score distributions across a folder |
 | Browser tool and optional API | Checking batches, exporting results, and connecting another backend |
+| Multi-metric benchmark and demo | Independent calibration, frozen-policy replay, and reproducible comparisons |
 
 No images are persisted by the API. The browser previews selected images locally
 and uploads them only when analysis is requested. HTTP uploads may use temporary
@@ -80,6 +114,53 @@ indicate more edge detail. `is_blurry` is true when the score is below the thres
 a score exactly equal to the threshold passes. This score is not a percentage or
 confidence value, and passing the threshold does not establish overall image quality.
 
+### Compare core sharpness metrics
+
+```python
+from laplacian_blur_detector import (
+    calculate_sharpness, calculate_tenengrad_score, analyze_local_sharpness,
+)
+
+laplacian = calculate_sharpness(image, metric="laplacian")
+tenengrad = calculate_tenengrad_score(image)
+# Equivalent: calculate_sharpness(image, metric="tenengrad")
+
+cells = analyze_local_sharpness(image, grid_size=(8, 8), metric="tenengrad")
+for cell in cells:
+    print(cell["x"], cell["y"], cell["width"], cell["height"],
+          cell["sharpness_score"], cell["is_low_texture"])
+```
+
+| Metric | Definition | Main limitations |
+| --- | --- | --- |
+| `laplacian` | Variance of the grayscale Laplacian response; same definition as `calculate_blur_score()` | Sensitive to noise, contrast, content, and resizing |
+| `tenengrad` | Mean of `Sobel_x² + Sobel_y²`, using unscaled 3×3 Sobel kernels | Measures gradient energy; noise and high contrast can also raise the score |
+
+**Scores from different metrics cannot be compared directly.** Neither is a
+percentage or confidence value. Do not reuse a Laplacian threshold for Tenengrad.
+Keep intensity scale, resolution, preprocessing, and content comparable when
+comparing the same metric; intensities are not normalized automatically.
+
+Local analysis defaults to 8 rows × 8 columns; `grid_size=4` means 4×4, and
+`grid_size=(3, 5)` means 3 rows × 5 columns. Cells are returned in row-major order
+with zero-based pixel coordinates. Remainder pixels are included; grids larger
+than the image dimensions are rejected. Derivatives are computed on the full
+image before cell statistics, so grid boundaries introduce no artificial
+reflection gradients. The outer image border still uses OpenCV reflection.
+
+Each cell also reports grayscale `texture_std` and `is_low_texture`, true when
+`texture_std <= min_texture_std` (default `5.0`, in native intensity units,
+intended for 0–255 images). Low texture provides insufficient evidence to infer
+blur. The marker is a heuristic: a heavily blurred region may also have low
+texture, and an unflagged region is not guaranteed sharp. Local analysis returns
+measurements and flags, with no `is_blurry` classification. Adjust the texture
+cutoff for normalized float or 16-bit images and calibrate any downstream policy
+on representative images.
+
+The core requires only NumPy/OpenCV. See the [API reference](docs/API.md) for signatures, supported
+arrays, output fields, and error behavior. Existing HTTP fields, CLI output,
+benchmark policies, and `detect_blur()` decisions remain unchanged.
+
 ## Command line
 
 ```bash
@@ -128,6 +209,63 @@ Select a filename to inspect its preview, metadata, score, and raw response.
 Each browser request analyzes one image, with a 30-second client timeout. Canceling
 stops further requests; work already accepted by the server may finish. No login
 or image labeling is needed.
+
+### Interactive local heatmap
+
+Select a filename, then select **Heatmap** in the **Relative Sharpness** panel.
+This sends that image to the independent local-analysis endpoint; batch analysis
+is not required first. Switch **Laplacian / Tenengrad**, set rows and columns,
+and adjust **Opacity**. Hover or tap a cell for its pixel coordinates, raw score,
+texture standard deviation, and low-texture status. Keyboard users can focus the
+map and inspect cells with arrow keys. **Original** restores the uncolored preview.
+
+The blue → teal → yellow ramp maps the minimum/maximum raw scores of cells above
+the texture cutoff in this image to lower/higher relative values. Low-texture
+cells use a separate gray/white hatch and do not set the color range. Equal
+textured scores use the midpoint color; an entirely low-texture image has no
+color range. These are **Relative Sharpness** values, not standardized scores
+that can be compared across images or metrics. Colors do not locate true blur.
+
+HTTP grids are limited to 1–32 rows/columns (at most 1,024 cells), with each cell
+at least 16×16 pixels. The 8×8 default therefore requires at least 128×128 pixels;
+use a smaller grid for small images. The Python library retains its unrestricted
+grid behavior. Texture cutoff defaults to `5.0` in native grayscale units and
+should be adjusted for full-range 16-bit images. JPEG EXIF orientation is applied
+to local measurements to align coordinates with browser previews.
+
+Metric/grid/cutoff changes refresh only the local map. Switching files clears it;
+late responses cannot overwrite the new preview. Original/Heatmap toggles and
+opacity changes reuse the current result. Batch analysis takes priority over
+pending local work; queue filters, sorting, retry, cancellation, and CSV retain
+their original behavior. Batch CSV still exports whole-image Laplacian results.
+
+For a reproducible local demo, from the repository root:
+
+```powershell
+.venv\Scripts\python.exe examples/create_sharpness_demo.py
+.venv\Scripts\python.exe -m uvicorn api.main:app --host 127.0.0.1 --port 8000
+```
+
+Open [the local demo](http://127.0.0.1:8000), select **Try generated demo** (or
+choose `outputs/sharpness-demo.png`), set 8 rows × 12 columns, then select **Heatmap**.
+The fixture has a crisp pattern on the left, a Gaussian-softened pattern in the
+middle, and flat content on the right. Try both metrics and the opacity slider;
+the flat panel is hatched rather than classified as blurry. This fixture checks
+visual behavior and is not an accuracy benchmark.
+
+### POST /api/sharpness/local
+
+Accepts multipart `image`, optional `metric` (`laplacian` or `tenengrad`),
+`grid_rows`/`grid_columns` (default `8`), and `min_texture_std` (default `5.0`).
+Returns image metadata, selected settings, and row-major `cells` with coordinates,
+raw scores, and texture information. No blur classification or normalized score
+is returned. It uses the same file/header/pixel/request limits and bounded worker
+slots as the existing endpoints. See the [local HTTP contract](docs/API.md#local-http-api)
+for response fields, limits, and error codes.
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/sharpness/local -F "image=@sample.jpg" -F "metric=tenengrad" -F "grid_rows=8" -F "grid_columns=8"
+```
 
 ### POST /api/blur/check
 
@@ -240,6 +378,8 @@ not required to use the image checker. Label a dataset with `filename,label,spli
 ```bash
 laplacian-blur-benchmark data/labels.csv --calibrate --output outputs/experiment-01
 laplacian-blur-benchmark data/new-labels.csv --policy outputs/experiment-01/policy.json --output outputs/experiment-02
+laplacian-blur-benchmark data/labels.csv --compare --calibrate --output outputs/metric-comparison
+laplacian-blur-benchmark data/labels.csv --metric tenengrad --calibrate --output outputs/tenengrad
 ```
 
 Thresholds are selected per domain using calibration samples only. Held-out test
@@ -247,6 +387,16 @@ reports include false rejections, missed retakes, confusion counts, and an error
 list. Reports preserve policy, preprocessing, dataset fingerprints, and runtime
 versions, and refuse to overwrite previous runs. Capture-group and duplicate-image
 checks help catch calibration/test overlap.
+
+`--compare` runs the existing benchmark once per metric, with independent
+thresholds and policies, then writes comparison CSV/JSON and an SVG chart.
+`--compare --policy outputs/metric-comparison` replays both frozen policies.
+`--metric tenengrad` requires its own explicit threshold, calibration, or frozen
+policy; the original default of Laplacian with threshold 100 is preserved.
+Summary metrics include balanced accuracy, retake precision/recall/F1, false
+reject/missed retake rates, and decode-plus-measurement latency. Missing class
+denominators are reported as null. The legacy `blur_score` CSV column holds the
+selected metric's raw value; it is not a shared score scale.
 
 See [the benchmarking guide](docs/BENCHMARKING.md) for the CSV format, objective,
 limitations, and a runnable synthetic document/product dataset example. Human
@@ -258,7 +408,7 @@ labels and real representative data are needed to assess accuracy.
 python -m ruff check .
 python -m pytest -q
 python -m build
-node --test tests/web/batch-utils.test.mjs
+node --test tests/web/*.test.mjs
 ```
 
 CI is configured to run on Ubuntu and Windows with Python 3.10, 3.12, and 3.13.
