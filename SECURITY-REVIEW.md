@@ -117,6 +117,9 @@ not a penetration test, a security guarantee, or public-deployment approval.
 **BLOCKED for public production deployment/formal release due to unresolved
 image findings and pending browser acceptance.** Trusted loopback development
 can continue with the documented resource boundaries. See [caveats](SECURITY-CAVEATS.md).
+The [targeted container triage](docs/CONTAINER_TRIAGE.md) distinguishes a
+conditional trusted local-use experimental pre-release from public/stable hosting;
+it does not declare libxml2 unreachable or authorize publication.
 No persistent-format/database migration is introduced. To roll back a deployment,
 build an independent artifact from known-good Phase 4 `4388749` with its matching
 dependency environment, smoke-test health/contracts, then switch traffic. Do not

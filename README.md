@@ -464,11 +464,14 @@ See the contribution guide for installed-wheel verification and release steps.
 
 ```bash
 docker build -t laplacian-blur-detector .
-docker run --rm -p 8000:8000 laplacian-blur-detector
+docker run --rm --cap-drop=ALL --security-opt no-new-privileges:true --memory=1536m --cpus=2 --pids-limit=128 --read-only --tmpfs /tmp:rw,noexec,nosuid,size=64m -p 127.0.0.1:8000:8000 laplacian-blur-detector
 ```
 
 The image installs the server extra and includes the browser tool and upload
 limits. Containerization does not add authentication or per-client rate limiting.
+The example binds only to local loopback, drops Linux capabilities and prevents
+setuid/file-capability privilege gains. It does not patch native libraries or make
+untrusted images safe. See [targeted container triage](docs/CONTAINER_TRIAGE.md).
 
 ## License
 
