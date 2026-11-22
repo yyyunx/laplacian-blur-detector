@@ -155,3 +155,13 @@ Latency is recorded separately in `latency.csv` and summary metadata, without
 changing predictions CSV columns. It includes one decode plus metric call per
 image, without warmup, and excludes file IO/hashing/calibration/report writing.
 These timings are hardware/load dependent, not rigorous performance rankings.
+
+## Reproducible stress inputs
+
+`laplacian_blur_detector.synthetic.generate_dataset(output, seed=2026,
+samples_per_case=4)` writes a new dataset with six variants per source capture
+and disjoint calibration/test capture groups. It records generator version,
+parameters, seed, dependency versions, and synthetic label rules in dataset.json.
+Use a new directory; existing datasets are preserved. Flat/sharp content is
+synthetically usable; induced blur/noisy blur is retake. This is a stress
+experiment and does not establish real-world accuracy.

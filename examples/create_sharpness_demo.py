@@ -1,23 +1,21 @@
-"""Generate a local-only crisp / softened / flat heatmap fixture."""
+"""Generate a local-only sharp / softened / flat fixture for the heatmap demo."""
 
 import argparse
 from pathlib import Path
 
 import cv2
-import numpy as np
+from laplacian_blur_detector.synthetic import preview_image
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=Path("outputs/sharpness-demo.png"))
     args = parser.parse_args()
-    y, x = np.indices((512, 256))
-    pattern = (((x // 8 + y // 8) % 2) * 200 + 25).astype(np.uint8)
-    image = np.concatenate([pattern, cv2.GaussianBlur(pattern, (15, 15), 3), np.full_like(pattern, 125)], axis=1)
+    image = preview_image()
     args.output.parent.mkdir(parents=True, exist_ok=True)
     if not cv2.imwrite(str(args.output), image):
         raise RuntimeError(f"Could not write {args.output}")
-    print(f"Wrote {args.output}: crisp, Gaussian softened, and flat content.")
+    print(f"Wrote {args.output}: left=crisp pattern, middle=Gaussian softened, right=flat content.")
 
 
 if __name__ == "__main__":

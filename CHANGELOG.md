@@ -2,6 +2,10 @@
 
 ## Unreleased — 0.3.0
 
+- Add versioned seeded synthetic sharp, Gaussian/motion/partial blur, flat-content,
+  and noisy-blur experiments, recording parameters and split-isolated capture groups.
+  Synthetic labels are generation conventions, not real-image accuracy evidence.
+
 - Add single-metric Tenengrad benchmarking with independent calibration, strict
   frozen metric/preprocessing contracts, and separate decode/metric latency.
   Preserve default Laplacian policies, CLI usage, and prediction columns.
