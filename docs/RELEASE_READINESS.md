@@ -59,6 +59,8 @@ TCP/proxy disconnect behavior; no hard native-work deadline is implemented.
 - [ ] Complete real 1280px/390px browser visual acceptance, including EXIF,
   pointer/touch/keyboard, opacity, errors/retry and stale responses. A manual
   checklist is acceptable evidence of an open gate, not a passed gate.
+- [x] Provide a reproducible fallback [browser QA checklist](BROWSER_QA.md) and
+  synthetic EXIF/display fixtures after the bounded Phase 5 binding attempt failed.
 - [ ] Verify installation/demo in a clean dependency environment, wheel and sdist,
   supported Python/OS CI matrix, and Docker build/live smoke checks.
 - [ ] Finish release notes, contributor steps, integration examples and explicit
