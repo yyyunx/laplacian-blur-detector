@@ -2,6 +2,10 @@
 
 ## Unreleased — 0.3.0
 
+- Add `--compare` with independent per-metric calibration/frozen replay,
+  held-out CSV/JSON, dependency-free SVG, per-reason summaries and latency.
+  Stage complete comparisons and reject datasets changed between metric runs.
+
 - Add versioned seeded synthetic sharp, Gaussian/motion/partial blur, flat-content,
   and noisy-blur experiments, recording parameters and split-isolated capture groups.
   Synthetic labels are generation conventions, not real-image accuracy evidence.

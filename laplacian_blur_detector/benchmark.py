@@ -322,9 +322,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     mode.add_argument("--policy", type=Path, help="Frozen JSON policy, or prior comparison directory with --compare")
     mode.add_argument("--threshold", type=float, help="Fixed threshold (default: 100 for Laplacian only)")
     parser.add_argument("--metric", choices=tuple(METRICS), help="Metric (default: Laplacian, or infer from frozen policy)")
+    parser.add_argument("--compare", action="store_true", help="Compare Laplacian and Tenengrad with independent calibrated/frozen policies")
     parser.add_argument("--false-reject-cost", type=float, help="Calibration weight for usable images rejected (default: 1)")
     parser.add_argument("--missed-retake-cost", type=float, help="Calibration weight for retake images accepted (default: 1)")
     args = parser.parse_args(argv)
+    if args.compare and (args.metric or not (args.calibrate or args.policy)):
+        parser.error("--compare requires --calibrate or --policy <comparison-directory>, without --metric.")
     if not args.calibrate and (args.false_reject_cost is not None or args.missed_retake_cost is not None):
         parser.error("Cost options require --calibrate.")
     args.false_reject_cost = 1.0 if args.false_reject_cost is None else args.false_reject_cost
@@ -335,6 +338,13 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     try:
+        if args.compare:
+            from .benchmark_comparison import run_comparison
+            result = run_comparison(args)
+            for row in result["rows"]:
+                print(f"{row['metric']} / {row['domain']}: threshold={row['threshold']:.6g}, balanced_accuracy={row['balanced_accuracy']}, mean_ms={row['mean_ms']:.3f}")
+            print(f"Wrote metric comparison to {args.output}")
+            return 0
         summary = run_benchmark(args)
     except (OSError, ValueError, TypeError, csv.Error) as error:
         print(f"Error: {error}", file=sys.stderr)
