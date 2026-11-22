@@ -8,7 +8,7 @@ to identify the final candidate; no GitHub Release, tag or PyPI upload is create
 | Check | Observed result |
 | --- | --- |
 | Ruff | Passed |
-| Python regression | 217 passed on Windows/Python 3.12.14 |
+| Python regression | 217 passed before readiness fix; three focused startup/deadline/contract regressions added; final suite is 220 |
 | Frontend controller/mapping tests | 21 passed; no npm dependencies |
 | Package build | sdist and wheel built successfully |
 | Fresh wheel environment | Actual dependency installation, outside-checkout CLI/API/demo smoke and `pip check` passed |
@@ -21,6 +21,7 @@ to identify the final candidate; no GitHub Release, tag or PyPI upload is create
 | Package content inspection | No virtual environments, output/temp directories, key files or bytecode; images were only generated demo assets |
 | Existing candidate CI | Naming, resources and QA-record commits each passed seven jobs (Ubuntu/Windows × Python 3.10/3.12/3.13, plus Node) |
 | New container gate | Added build, UID/read-only/resource-limited runtime and live HTTP smoke; the pushed candidate's Actions result is authoritative |
+| First container CI attempt | Run 44997317964 built/started non-root successfully but smoke hit a startup connection reset; readiness now retries transient connection errors within its fixed deadline, preserving response assertions |
 | Local Docker build | Not executed: Docker CLI 29.6.2 exists, Docker Desktop Linux daemon named pipe unavailable; CI provides the executable alternative |
 | Actual browser visual/input QA | NOT ACCEPTED: bounded inventory timed out before a surface was obtained; no screenshot; [manual steps](BROWSER_QA.md) |
 | Dedicated CVE/container vulnerability scan | Not performed; maintainer gate before release |

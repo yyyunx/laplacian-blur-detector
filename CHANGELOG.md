@@ -2,6 +2,8 @@
 
 ## Unreleased — 0.3.0
 
+- Handle transient connection resets during live-service readiness checks within
+  a fixed deadline; retain strict health/analysis assertions after startup.
 - Add release gates/notes, local integration and live-HTTP smoke examples, explicit
   security review/caveats, generated manual-QA EXIF fixtures, and a non-root Docker
   image with an allowlisted build context and CI container build/runtime smoke job. Preserve pending visual

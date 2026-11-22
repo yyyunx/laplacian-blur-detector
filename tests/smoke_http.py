@@ -8,6 +8,25 @@ from urllib.error import URLError
 from urllib.request import Request, urlopen
 
 
+def wait_for_health(base, timeout=30, interval=0.25):
+    """Wait through transient startup resets, while preserving the health contract."""
+    deadline = time.monotonic() + timeout
+    while True:
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise TimeoutError("Service did not become healthy before the deadline")
+        try:
+            with urlopen(base + "/healthz", timeout=min(5, remaining)) as response:
+                assert response.status == 200
+                assert json.load(response) == {"status": "ok"}
+            return
+        except (URLError, ConnectionError, TimeoutError) as error:
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                raise TimeoutError("Service did not become healthy before the deadline") from error
+            time.sleep(min(interval, remaining))
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--url", default="http://127.0.0.1:8000")
@@ -20,15 +39,7 @@ def main():
             assert response.status == 200
             return response.read()
 
-    deadline = time.monotonic() + 30
-    while True:
-        try:
-            assert json.loads(get("/healthz")) == {"status": "ok"}
-            break
-        except (URLError, TimeoutError):
-            if time.monotonic() >= deadline:
-                raise
-            time.sleep(0.25)
+    wait_for_health(base)
     assert b"Laplacian Blur Detector" in get("/")
     for asset in ("app.js", "heatmap.js", "quality-diagnostics.js", "styles.css", "demo.png"):
         assert get("/static/" + asset)
