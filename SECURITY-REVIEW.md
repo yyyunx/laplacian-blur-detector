@@ -51,6 +51,27 @@ not a penetration test, a security guarantee, or public-deployment approval.
 - Owner/target: release maintainer, before publication. PR #3 remains the original
   six Phase 5 commits; the necessary fix is independently reviewable.
 
+## SEC-005: Unresolved container distribution and SBOM findings
+
+- Severity/status: Critical as reported by Trivy; open publication blocker.
+- Evidence: first full-image report for `7223067`, Actions run 44999876825,
+  contains 312 package/advisory records (149 unique IDs), including libxml2
+  CVE-2026-6653. Debian's [tracker](https://security-tracker.debian.org/tracker/CVE-2026-6653)
+  lists the installed trixie version as vulnerable, with no fixed trixie package;
+  it also describes the issue as minor/no-dsa. Neither label alone establishes
+  exploitability through this JPG/PNG API.
+- Impact: inherited distribution components and embedded build SBOMs require
+  vendor/reachability triage. Do not equate scanner records with independent
+  exploitable application bugs or silently downgrade them.
+- Required fix: apply available same-release OS updates, verify actual installed
+  Python packages versus embedded SBOM components, and review remaining vendor
+  findings before public deployment. Do not mix unstable repositories or add a
+  vulnerable-component ignore rule solely to reduce counts.
+- Validation: inspect the latest full-image JSON and installed-package artifact.
+  Browser acceptance remains a separate open gate; green report-collection CI
+  does not constitute security approval.
+- Owner/target: release maintainer with distribution/vendor support, before release.
+
 ## SEC-001: Public deployment requires operator controls
 
 - Severity/status: Medium for the documented local demo; open deployment boundary.
@@ -93,8 +114,9 @@ not a penetration test, a security guarantee, or public-deployment approval.
 
 ## Decision and rollback
 
-**CONDITIONAL for trusted loopback development/demo; public production deployment
-and formal release are not approved.** See [caveats](SECURITY-CAVEATS.md).
+**BLOCKED for public production deployment/formal release due to unresolved
+image findings and pending browser acceptance.** Trusted loopback development
+can continue with the documented resource boundaries. See [caveats](SECURITY-CAVEATS.md).
 No persistent-format/database migration is introduced. To roll back a deployment,
 build an independent artifact from known-good Phase 4 `4388749` with its matching
 dependency environment, smoke-test health/contracts, then switch traffic. Do not
