@@ -7,7 +7,10 @@ The project is an open-source image quality toolkit that others can use, integra
 and contribute to. Vehicle photos are one use case alongside document capture,
 product photography, and other image upload workflows.
 
-**Current status: early-stage, stateless toolkit.** The Python core measures
+**Current candidate: 0.3.0a1 — Experimental, trusted local images only.**
+This is a review candidate, not a published release or Production Ready service.
+Public unauthenticated HTTP hosting is not recommended; container advisories remain.
+The Python core measures
 Laplacian variance, Tenengrad, and local grid sharpness with an interactive relative
 heatmap. The benchmark can compare metrics using independent thresholds. The
 single-image CLI, batch decisions, and default benchmark retain the original
@@ -25,8 +28,8 @@ Use Python 3.10+. For a new checkout:
 ```bash
 git clone https://github.com/yyyunx/laplacian-blur-detector.git
 cd laplacian-blur-detector
-# For this unreleased candidate (before the draft PRs are merged):
-git switch --track origin/fix/container-runtime-isolation
+# Review candidate; no v0.3.0a1 tag or published download is assumed:
+git switch --track origin/release/0.3.0a1
 python -m venv .venv
 ```
 
@@ -68,7 +71,9 @@ and [maintainer browser acceptance](docs/BROWSER_QA.md). On 2026-11-23 the maint
 reported manual browser QA passed for the listed scope; this was not a Codex
 browser run. Missing browser/build/touch evidence is recorded. This remains an
 unreleased experimental candidate for trusted images in a bounded local setup,
-with unresolved container advisories. See the [ordered integration plan](docs/INTEGRATION_PLAN.md).
+with unresolved container advisories. PR #1–#5 are merged; see the
+[integration record](docs/INTEGRATION_PLAN.md) and
+[versioned attachment/install instructions](docs/PRERELEASE_PREPARATION.md).
 
 ## Choose how to use it
 

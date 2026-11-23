@@ -10,7 +10,7 @@ from .sharpness import (
     calculate_tenengrad_score,
 )
 
-__version__ = "0.3.0"
+__version__ = "0.3.0a1"
 __all__ = [
     "BlurDetectionResult", "calculate_blur_score", "detect_blur",
     "LocalSharpnessResult", "SharpnessMetric", "analyze_local_sharpness",
