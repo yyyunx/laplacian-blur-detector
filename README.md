@@ -26,7 +26,7 @@ Use Python 3.10+. For a new checkout:
 git clone https://github.com/yyyunx/laplacian-blur-detector.git
 cd laplacian-blur-detector
 # For this unreleased candidate (before the draft PRs are merged):
-git switch --track origin/feature/release-readiness
+git switch --track origin/fix/container-runtime-isolation
 python -m venv .venv
 ```
 
@@ -64,8 +64,11 @@ real-world accuracy. No trained model or real-image accuracy improvement is clai
 
 Before formal release, review [release gates](docs/RELEASE_READINESS.md),
 [actual resource costs](docs/PERFORMANCE.md), [integration examples](docs/INTEGRATION.md)
-and [pending browser QA](docs/BROWSER_QA.md). This remains an unreleased candidate;
-automated checks do not establish desktop/mobile visual acceptance.
+and [maintainer browser acceptance](docs/BROWSER_QA.md). On 2026-11-23 the maintainer
+reported manual browser QA passed for the listed scope; this was not a Codex
+browser run. Missing browser/build/touch evidence is recorded. This remains an
+unreleased experimental candidate for trusted images in a bounded local setup,
+with unresolved container advisories. See the [ordered integration plan](docs/INTEGRATION_PLAN.md).
 
 ## Choose how to use it
 
@@ -464,11 +467,14 @@ See the contribution guide for installed-wheel verification and release steps.
 
 ```bash
 docker build -t laplacian-blur-detector .
-docker run --rm -p 8000:8000 laplacian-blur-detector
+docker run --rm --cap-drop=ALL --security-opt no-new-privileges:true --memory=1536m --cpus=2 --pids-limit=128 --read-only --tmpfs /tmp:rw,noexec,nosuid,size=64m -p 127.0.0.1:8000:8000 laplacian-blur-detector
 ```
 
 The image installs the server extra and includes the browser tool and upload
 limits. Containerization does not add authentication or per-client rate limiting.
+The example binds only to local loopback, drops Linux capabilities and prevents
+setuid/file-capability privilege gains. It does not patch native libraries or make
+untrusted images safe. See [targeted container triage](docs/CONTAINER_TRIAGE.md).
 
 ## License
 

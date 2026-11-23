@@ -144,10 +144,12 @@ milestone runs the Windows/Ubuntu × Python 3.10/3.12/3.13 CI matrix before proc
 Current candidate evidence is maintained in [release readiness](RELEASE_READINESS.md).
 No benchmark labels or data were changed and no accuracy gain is claimed.
 
-Actual browser QA remains **not completed**. On the Phase 4 review attempt,
+Codex browser QA was **not completed** during Phase 4. On that review attempt,
 rebinding the existing localhost tab timed out after kernel reinitialization.
-Retries stopped; desktop/mobile rendering, pointer interactions and visual EXIF
-alignment must still be accepted manually. No browser screenshot is claimed.
+Retries stopped. On 2026-11-23 the maintainer reported browser QA passed for
+EXIF rotation, heatmap/metric/opacity/hover, diagnostics, 390px layout, errors and
+batch flow. See [the scoped acceptance record](BROWSER_QA.md) for missing evidence
+and supplemental checks. No Codex browser session or screenshot is claimed.
 
 Manual checklist (retain the existing [heatmap checklist](VALIDATION.md#repeat-the-pending-visual-checks)):
 

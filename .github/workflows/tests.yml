@@ -17,10 +17,14 @@ jobs:
         run: docker build --tag sharpness-smoke .
       - name: Start bounded non-root read-only service
         run: |
-          docker run --detach --name sharpness-smoke --memory=1536m --cpus=2 --pids-limit=128 --read-only --tmpfs /tmp:rw,noexec,nosuid,size=64m --publish 127.0.0.1:8000:8000 sharpness-smoke
+          docker run --detach --name sharpness-smoke --cap-drop=ALL --security-opt no-new-privileges:true --memory=1536m --cpus=2 --pids-limit=128 --read-only --tmpfs /tmp:rw,noexec,nosuid,size=64m --publish 127.0.0.1:8000:8000 sharpness-smoke
           test "$(docker exec sharpness-smoke id -u)" = 10001
       - name: Live HTTP contracts and bundled assets
         run: python tests/smoke_http.py
+      - name: Inspect bounded runtime and metadata paths
+        run: |
+          mkdir -p security-results
+          docker exec --env LD_DEBUG=libs -i sharpness-smoke python - < scripts/inspect_container_runtime.py > security-results/runtime-reachability.json 2> security-results/runtime-loader.log
       - name: Collect full-image vulnerability report (not release approval)
         run: |
           mkdir -p security-results
@@ -54,7 +58,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: container-security-results
-          path: security-results/*.json
+          path: |
+            security-results/*.json
+            security-results/runtime-loader.log
           if-no-files-found: warn
           retention-days: 14
       - name: Container logs and cleanup
@@ -97,7 +103,10 @@ jobs:
       - name: Test
         run: python -m pytest -q
       - name: Build source and wheel distributions
-        run: python -m build
+        run: |
+          python -c "from pathlib import Path; p=Path('examples/outputs/packaging-sentinel.txt'); p.parent.mkdir(parents=True, exist_ok=True); p.write_text('Generated local output must not ship')"
+          python -m build
+          python tests/check_distribution_contents.py
       - name: Install wheel
         shell: pwsh
         run: |

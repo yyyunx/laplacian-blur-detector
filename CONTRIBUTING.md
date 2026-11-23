@@ -79,7 +79,10 @@ Use [the security policy](SECURITY.md) for vulnerability reports.
 
 Use the evidence/status in [Release readiness](docs/RELEASE_READINESS.md) and
 [draft notes](docs/RELEASE_NOTES.md). Passing tests does not check off pending
-browser acceptance or operator deployment controls.
+or unreported browser substeps or operator deployment controls. Distinguish
+maintainer-reported manual QA from automation. Follow the
+[stacked integration plan](docs/INTEGRATION_PLAN.md) and
+[experimental version/assets checklist](docs/PRERELEASE_PREPARATION.md).
 
 1. Update `laplacian_blur_detector/__init__.py` and the changelog together.
 2. Run `python -m ruff check .`, `python -m pytest -q`, and `python -m build`.

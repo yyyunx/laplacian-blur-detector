@@ -3,8 +3,10 @@
 This candidate supports review and bounded trusted local demos. It is not approved
 as an unauthenticated public production service or a formal release.
 
-- Actual desktop/mobile visual and touch/keyboard acceptance remains pending;
-  browser inventory timed out. No real screenshot is claimed.
+- Maintainer Manual Browser QA Passed was reported on 2026-11-23 for EXIF rotation,
+  heatmap/metrics/opacity/hover, diagnostics, 390px layout, errors and batch flow.
+  Browser/build provenance, screenshots, real touch and keyboard-specific coverage
+  were not supplied. Codex did not operate the browser; see [acceptance](docs/BROWSER_QA.md).
 - Client timeout/abort cannot kill accepted native work. Slots stay held until
   completion; multiple server processes multiply the two-slot limit.
 - RGB8 synthetic measurements do not bound every codec, 16-bit PNG, EXIF transform,

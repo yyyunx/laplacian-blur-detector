@@ -3,6 +3,9 @@
 This historical record describes the Phase 2–3 baseline (`fd2d00c`). Phase 4
 diagnostic checks and the current manual acceptance list are documented in
 [DIAGNOSTICS.md](DIAGNOSTICS.md#phase-4-validation-and-manual-acceptance).
+For the later 2026-11-23 Maintainer Manual Browser QA Passed report, use
+[BROWSER_QA.md](BROWSER_QA.md); the historical automation limitation below is not
+a claim that maintainer acceptance is still absent.
 
 Review date: 2026-11-22 (Asia/Taipei). Development uses incremental commits on
 `codex/sharpness-heatmap-benchmark`, with each tested milestone pushed and its
@@ -133,6 +136,10 @@ ignored output/build/test directories.
 ## Phase 5 acceptance update
 
 The bounded 2026-11-22 browser inventory attempt timed out before obtaining a
-surface. Actual browser acceptance remains pending. Follow the consolidated
+surface. Browser acceptance had not been completed at that point. Follow the consolidated
 [desktop/mobile checklist](BROWSER_QA.md); generated fixtures and EXIF display
 references can be created without any private images. No screenshot is claimed.
+
+On 2026-11-23 the maintainer subsequently reported manual browser QA passed for
+the listed feature categories; missing provenance and supplemental coverage are
+explicit in [BROWSER_QA.md](BROWSER_QA.md). Codex did not perform that browser session.

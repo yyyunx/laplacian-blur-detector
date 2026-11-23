@@ -45,12 +45,15 @@ failure isolation. It is not browser visual QA or a throughput/load test.
 
 ```bash
 docker build -t sharpness-local .
-docker run --rm --memory=1536m --cpus=2 --pids-limit=128 --read-only --tmpfs /tmp:rw,noexec,nosuid,size=64m -p 127.0.0.1:8000:8000 sharpness-local
+docker run --rm --cap-drop=ALL --security-opt no-new-privileges:true --memory=1536m --cpus=2 --pids-limit=128 --read-only --tmpfs /tmp:rw,noexec,nosuid,size=64m -p 127.0.0.1:8000:8000 sharpness-local
 ```
 
 The image runs as UID 10001; its default command listens on port 8000 inside the
-container. Bind to loopback for local use. The resource settings above illustrate
-a bounded demo, not a capacity guarantee for every 20MP/dtype/codec combination.
+container. Bind to loopback for local use.
+Drop capabilities and enable no-new-privileges in your actual deployment too;
+the Dockerfile's non-root USER alone does not enforce those runtime settings.
+The resource settings illustrate a bounded demo, not a capacity guarantee for
+every 20MP/dtype/codec combination.
 Temporary multipart files need a writable temporary filesystem. Run the HTTP smoke
 after readiness; resource profiling belongs in a separate controlled experiment.
 
