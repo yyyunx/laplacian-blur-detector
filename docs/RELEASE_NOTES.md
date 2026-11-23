@@ -1,8 +1,10 @@
-# Draft experimental local-use pre-release notes — version not yet approved
+# v0.3.0a1 — Experimental pre-release review notes
 
-Current source/package metadata: **0.3.0**, unreleased. Proposed experimental
-version: **0.3.0a1**, awaiting maintainer decision and a reviewed version change.
-These notes are not an announcement, tag or approved download release.
+Prepared 2026-11-23. Python package version **0.3.0a1**; intended tag
+**v0.3.0a1** is not created. PR #1–#5 are merged at a91b8e5. This separate
+version PR and its Review attachments await maintainer review/merge. No Release
+or PyPI publication. Attachment copies identify their exact source commit via
+SOURCE.json and SHA256SUMS; final assets must be rebuilt from final main.
 
 **Intended use: trusted images in a bounded local environment only.** Keep the
 experimental label and advisory/evidence limits. This is not Production Ready and
@@ -45,14 +47,19 @@ heatmap/metric/opacity/hover, diagnostics, 390px layout, errors and batch flow.
 Codex did not perform that browser session. Browser/build provenance, screenshots,
 physical-touch and keyboard-specific evidence were not supplied; see [QA scope](BROWSER_QA.md).
 
-The recorded 2026-11-22 container scan retains 1 Critical and 65 High package/
-advisory records, plus other severities; this is not a count of independently
-exploitable API bugs. libxml2 remains installed and its image-path reachability is
-not proven, not universally ruled out. Installer and available OS fixes do not
-resolve all vendor findings. Read [targeted triage](CONTAINER_TRIAGE.md).
+The 2026-11-23 merged-main image report still contains 1 Critical and 65 High
+records, plus other severities; these are not counts of proven API exploit paths.
+libxml2 remains installed; reachability is not proven, not universally ruled out.
+No supported trixie fix is currently recorded in Debian's tracker. Read the
+[scoped security review](PRERELEASE_SECURITY_REVIEW.md) and retained
+[targeted triage](CONTAINER_TRIAGE.md); remaining findings are not suppressed.
 
-Maintainer reviews/ordered merges, the final experimental version/tag, risk
-acceptance, versioned wheel/sdist/checksums and publication approval remain open.
-Follow [integration order](INTEGRATION_PLAN.md), [asset/version preparation](PRERELEASE_PREPARATION.md),
+A historical Windows benchmark report-directory rename received WinError 5.
+The relevant code/test were unchanged between PR #4/#5; bounded single/full tests
+and Windows CI subsequently passed. It remains an unreproduced environmental
+suspected issue with root cause unconfirmed, not a claimed permanent repair.
+
+Review/merge of the version PR, final-main asset rebuild, risk acceptance and
+publication approval remain open. Follow [asset preparation](PRERELEASE_PREPARATION.md),
 [release gates](RELEASE_READINESS.md) and [security caveats](../SECURITY-CAVEATS.md).
-No GitHub Release or PyPI publication is performed by this work.
+No new algorithm, API response, CLI behavior or dependency change in this bump.

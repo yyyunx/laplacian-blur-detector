@@ -1,4 +1,10 @@
-# Phase 5 validation record (2026-11-22)
+# Historical Phase 5 validation record (2026-11-22)
+
+PR #1–#5 are now merged at a91b8e5 with 8/8 main CI. Current 0.3.0a1
+version/asset validation is separate and recorded in its Draft PR, source manifest
+and [pre-release procedure](PRERELEASE_PREPARATION.md). Historical evidence below
+is not relabeled as testing the new version artifacts.
+
 
 This records actual evidence and explicit limits, not publication approval.
 Current acceptance update (2026-11-23): the maintainer reported manual browser QA
@@ -58,7 +64,7 @@ Never point pytest's disposable basetemp at valuable existing data.
 CI now requires eight jobs: the six Python/OS combinations, Node checks and the
 container gate. Each Python job installs/smokes both built wheel and sdist outside
 checkout. Check the exact pushed SHA/branch, not merely an older successful run:
-[candidate Actions](https://github.com/yyyunx/laplacian-blur-detector/actions?query=branch%3Afeature%2Frelease-readiness).
+[candidate Actions](https://github.com/yyyunx/laplacian-blur-detector/actions?query=branch%3Arelease%2F0.3.0a1).
 
 No benchmark label, threshold-selection rule or metric-version definition was
 changed to improve reported results. Synthetic demo output verifies operation,

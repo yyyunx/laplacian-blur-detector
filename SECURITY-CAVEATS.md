@@ -15,8 +15,8 @@ as an unauthenticated public production service or a formal release.
   monitoring and incident ownership belong to the deployment operator.
 - Dependency ranges are not a deployment lock. CI and `pip check` are not CVE
   scans. Final follow-up pip-audit found six unique installer advisories in pip
-  25.0.1; local environments were repaired and a separate Docker bootstrap fix is
-  supplied. Full-image Trivy artifacts and findings require maintainer review.
+  25.0.1; local environments were repaired and the independent Docker bootstrap fix is
+  merged in PR #4. Full-image Trivy artifacts and findings require maintainer review.
   CI report collection can succeed while reporting vulnerabilities; it is not a
   severity-based publication gate. Reports are retained for 14 days: preserve
   reviewed evidence before expiry and rescan before release.
@@ -32,3 +32,7 @@ as an unauthenticated public production service or a formal release.
 
 Finding owners, evidence and rollback are in [SECURITY-REVIEW.md](SECURITY-REVIEW.md).
 Use [the release checklist](docs/RELEASE_READINESS.md); do not hide pending gates.
+
+Current 0.3.0a1 version-candidate status and the 2026-11-23 merged-main
+artifact/official Debian recheck are in [scoped release review](docs/PRERELEASE_SECURITY_REVIEW.md).
+Earlier counts above identify historical snapshots, not the latest candidate.

@@ -1,5 +1,11 @@
 # Release-candidate security review
 
+Current 0.3.0a1 review status: PR #1–#5 are merged at a91b8e5; installer/OS
+and runtime-isolation fixes are integrated. The dated Phase 5 evidence below is
+historical. See [current scoped review](docs/PRERELEASE_SECURITY_REVIEW.md) for
+actual artifact counts, Debian status and candidate audit boundaries.
+
+
 Scope: Phase 5, based on Phase 4 `4388749`, resource change `0825628` and QA record
 `c12103a`. The final Phase 5 Git commit/CI identifies the reviewed source. This is
 not a penetration test, a security guarantee, or public-deployment approval.

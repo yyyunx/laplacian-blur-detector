@@ -1,89 +1,77 @@
-# Experimental local-use pre-release preparation
+# 0.3.0a1 Experimental pre-release preparation
 
-Scope: trusted images, a bounded local environment, loopback-only serving and
-explicit advisory disclosure. No production-ready, vulnerability-free, real-world
-accuracy-improvement or general public-hosting claim is made.
+Python metadata is **0.3.0a1**, supplied dynamically by Hatch from
+laplacian_blur_detector/__init__.py. It is a real Python pre-release suffix;
+Development Status remains Alpha. This is a version Review PR, not a published
+tag/Release/PyPI version. PR #1–#5 are [already merged](INTEGRATION_PLAN.md).
 
-## Version decision — not applied by this task
+**Trusted images, bounded local environment only. Not Production Ready; public
+unauthenticated HTTP hosting is not recommended. Container advisories remain.**
 
-`laplacian_blur_detector.__version__` is currently **0.3.0**, read dynamically by
-Hatch/pyproject metadata. It has no pre-release suffix. Development Status is Alpha.
-The draft changelog/notes use 0.3.0; there is no new release/tag from this task.
-
-Recommend **0.3.0a1** for the first experimental distribution, subject to maintainer
-confirmation. A GitHub "Pre-release" checkbox does not change Python package
-metadata: do not rename a 0.3.0 wheel to a1 or claim pip sees it as a pre-release.
-After approval, update the version source, changelog/notes and intended tag together
-in a reviewed change, rebuild from the final integrated SHA and verify metadata.
-See [Python version semantics](https://packaging.python.org/en/latest/specifications/version-specifiers/).
-
-## Installation and compatibility
-
-Current source-review candidate (all five PRs, no published version assumed):
+## Install the review source
 
 ```bash
 git clone https://github.com/yyyunx/laplacian-blur-detector.git
 cd laplacian-blur-detector
-git switch --track origin/fix/container-runtime-isolation
+git switch --track origin/release/0.3.0a1
 python -m venv .venv
-# Activate using your platform's command, then:
+# Activate using the platform-specific README instructions:
 python -m pip install -e ".[server]"
-laplacian-blur-demo --output outputs/local-review-demo
+python -c "import laplacian_blur_detector as p; print(p.__version__)"
+laplacian-blur-demo --output outputs/alpha-demo
 laplacian-blur-serve
 ```
 
-Use a new demo output directory on repeat. Once the reviewed stack/version is
-merged and a tag is explicitly approved/created, replace the review branch with
-that exact tag/SHA in release instructions. No such tag is presumed to exist now.
-Keep Docker on loopback with no-new-privileges, zero capabilities, read-only root,
-bounded temporary storage/memory/PIDs as in [integration](INTEGRATION.md).
+Choose a new demo output directory on repeat. Serving defaults to loopback.
+Use Docker's existing capability/no-new-privileges/read-only/resource controls
+in [integration examples](INTEGRATION.md). No v0.3.0a1 tag or PyPI availability
+is presumed by these instructions.
 
-The package declares Python >=3.10. Existing CI covers Windows/Ubuntu with
-3.10/3.12/3.13, plus Node 22 checks and Linux/amd64 container runtime evidence.
-macOS, ARM and every later Python/browser version are not certified by that matrix.
-The wheel is py3-none-any for this Python code; NumPy/OpenCV still require suitable
-platform wheels/system libraries. Server dependencies remain optional.
-Legacy library/CLI/blur API/default benchmark contracts remain unchanged.
+## Install a review attachment
 
-## Review attachments versus publication assets
+Download the files supplied for this Review PR and verify SHA256SUMS against the
+provided source manifest. These filenames are built from 0.3.0a1 source, not
+renamed 0.3.0 archives. From the download directory, choose one in a clean venv:
 
-Review builds are produced locally under ignored `outputs/integration-review/`.
-Their 0.3.0 filenames/metadata are **review-only**, not an approved pre-release or
-immutable publication artifact. No attachments are uploaded or final download URLs
-invented by this task. Local generated `examples/outputs` are excluded from sdist;
-the existing files remain untouched. CI builds with a generated-output sentinel
-and checks both archives so that exclusion is exercised rather than assumed.
+```bash
+python -m pip install "./laplacian_blur_detector-0.3.0a1-py3-none-any.whl[server]"
+# Alternative in a separate clean venv:
+python -m pip install "./laplacian_blur_detector-0.3.0a1.tar.gz[server]"
+python -c "import importlib.metadata as m; import laplacian_blur_detector as p; assert m.version('laplacian-blur-detector') == p.__version__ == '0.3.0a1'"
+```
 
-After version/merge approval, prepare from the exact final source:
+Local Review files are under ignored outputs/prerelease-0.3.0a1/review-assets/:
+wheel, sdist, RELEASE_NOTES.md, SOURCE.json and SHA256SUMS. SOURCE.json records
+the exact committed source SHA/tree/version/build environment. Checksums cover
+both packages, notes and source manifest; the checksum file excludes itself.
+No asset is uploaded as a Release in this task, and no download URL is invented.
 
-1. Build a wheel and sdist using the existing build tool; run
-   `python tests/check_distribution_contents.py --dist FINAL_DIST_DIRECTORY`.
-2. Check filename/METADATA/PKG-INFO/__version__ agreement and the approved suffix.
-3. Install each final artifact in a clean environment, run the existing installed
-   CLI/API/demo smoke from outside checkout and `pip check`. Reuse existing
-   source-level test evidence unless a new change/failure justifies more tests;
-   final versioned artifacts still need their own packaging smoke.
-4. Prepare `.whl`, `.tar.gz`, `SHA256SUMS`, draft release notes and security caveats.
-   Include source SHA, build environment and links/hashes for the reviewed runtime
-   inventory/Trivy/QA evidence. Do not attach private images, local fixtures,
-   temporary logs, virtual environments or large benchmark datasets.
-5. Preserve reviewed security artifacts before 2026-12-06 expiry and reassess at
-   release time. The existing 2026-11-22 findings are dated evidence, not a new
-   vulnerability database query today. A Docker image publication/digest, if ever
-   desired, is a separate maintainer decision; no registry image is published here.
-6. Only after explicit approval select the experimental/pre-release release mode,
-   approved tag and exact versioned files. No Release/PyPI publishing is authorized
-   in this task.
+## Final assets after this version PR is merged
 
-## Required release notice
+1. Fetch/verify final main and record its exact SHA/tree. Confirm the version PR
+   merged without an unintended source change and its current main CI succeeds.
+2. Build wheel/sdist from that SHA's clean archive. Recheck Hatch source,
+   filenames, wheel METADATA, sdist PKG-INFO and installed version equality.
+3. Run tests/check_distribution_contents.py with a generated-output sentinel
+   present; inspect for credentials/private images/temp paths. Independently
+   install wheel and sdist in clean venvs, run installed CLI/demo/API smoke outside
+   checkout and pip check. Do not rename old 0.3.0 packages.
+4. Rebuild notes, SOURCE.json and SHA256SUMS for the final main SHA. Review assets
+   are not substituted for final publication assets, even if the source tree is
+   unchanged by the merge. Reassess [security](PRERELEASE_SECURITY_REVIEW.md).
+5. Maintainer approves risk/scope, exact assets and publication separately. Only
+   then prepare a GitHub Draft Release; no tag/Release/PyPI action in this round.
 
-Experimental, trusted local images only. Malicious files remain a native-decoder
-risk even offline. Library/CLI calls do not inherit HTTP resource limits. Client
-abort cannot kill accepted native work. Remaining container OS/vendor/SBOM findings
-are retained; libxml2 reachability is not proven, not universally ruled out.
-Public unauthenticated HTTP hosting is not recommended.
+## Compatibility and evidence limits
 
-Maintainer Manual Browser QA Passed was reported on 2026-11-23 for its listed scope.
-Codex did not perform that browser session. Browser/build provenance, physical
-touch, keyboard-specific evidence and screenshots were not supplied. Disclose
-those limits without treating all unreported details as failed tests.
+Python >=3.10; current CI covers Windows/Ubuntu 3.10/3.12/3.13 and Node 22,
+with Linux/amd64 container evidence. macOS/ARM/every newer interpreter are not
+certified. The py3-none-any wheel still needs supported NumPy/OpenCV binaries.
+Core/CLI/API/default benchmark compatibility is retained; no algorithms or labels
+change. Synthetic demo smoke is functional evidence, not a new accuracy experiment.
+
+Maintainer Manual Browser QA Passed was reported 2026-11-23 for the listed
+[scope](BROWSER_QA.md); Codex did not operate that browser. Browser/build/device,
+physical touch, keyboard-specific evidence and screenshots were not supplied.
+The historical Windows report rename error was not reproduced in bounded checks;
+root cause remains unconfirmed. Keep this limitation visible if it recurs.

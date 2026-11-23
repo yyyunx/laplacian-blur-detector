@@ -96,7 +96,7 @@ profile at the 20-megapixel limit, repeated timing protocol, or production load
 test. Whole-image derivative arrays can consume substantial memory; the local
 route retains the existing two-worker bound but has not been capacity-tuned.
 
-## Repeat the pending visual checks
+## Supplemental visual checks (see maintainer-reported acceptance scope)
 
 1. Run `laplacian-blur-serve`, open `http://127.0.0.1:8000`, and select
    **Try generated demo**. Set 8 rows and 12 columns, then select **Heatmap**.

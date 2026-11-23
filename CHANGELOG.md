@@ -1,6 +1,14 @@
 # Changelog
 
-## Unreleased — 0.3.0
+## 0.3.0a1 — Experimental review candidate (2026-11-23, not published)
+
+- Set the Hatch version source to `0.3.0a1`; prepare new wheel/sdist review assets
+  from the version commit, with source provenance and SHA256 checksums. Final
+  publication assets must be rebuilt after the version PR merges.
+- Record completed Merge Commit integration of PR #1–#5 at `a91b8e5` and retain
+  all 18 original work commits. No algorithm, API, CLI or dependency change.
+- Preserve the historical Windows report-directory rename failure as unreproduced
+  after a bounded single/full test and Windows CI checks; root cause unconfirmed.
 
 - Record Maintainer Manual Browser QA Passed (2026-11-23) for the explicitly
   reported scope, with missing provenance/touch/keyboard evidence kept visible.
@@ -20,8 +28,8 @@
   a fixed deadline; retain strict health/analysis assertions after startup.
 - Add release gates/notes, local integration and live-HTTP smoke examples, explicit
   security review/caveats, generated manual-QA EXIF fixtures, and a non-root Docker
-  image with an allowlisted build context and CI container build/runtime smoke job. Preserve pending visual
-  acceptance and deployment responsibilities instead of claiming production readiness.
+  image with an allowlisted build context and CI container build/runtime smoke job.
+  Preserve manual-QA evidence limits and deployment responsibilities.
 - Reduce full-image allocations for integer sharpness and diagnostic inputs while
   preserving metric definitions and API contracts. Add opt-in guarded resource
   profiling, measured 1080p–20MP/concurrent results, and cancellation/timeout
@@ -50,7 +58,7 @@
   flat content, and noise contamination, with disjoint source captures, recorded
   seed/parameters, static heatmap illustrations, and a built-in browser demo image.
 - Document actual synthetic failures, reproducibility boundaries, and incomplete
-  desktop/mobile browser visual QA; no real-world accuracy improvement is claimed.
+  desktop/mobile browser QA evidence limits; no real-world accuracy improvement is claimed.
 - Add an interactive Relative Sharpness overlay with Original/Heatmap toggle,
   Laplacian/Tenengrad selection, grid/texture controls, opacity, hover/tap details,
   keyboard inspection, and separate low-texture hatching. Colors are relative to
