@@ -151,7 +151,7 @@ EXIF rotation, heatmap/metric/opacity/hover, diagnostics, 390px layout, errors a
 batch flow. See [the scoped acceptance record](BROWSER_QA.md) for missing evidence
 and supplemental checks. No Codex browser session or screenshot is claimed.
 
-Manual checklist (retain the existing [heatmap checklist](VALIDATION.md#repeat-the-pending-visual-checks)):
+Manual checklist (retain the existing [heatmap checklist](VALIDATION.md#supplemental-visual-checks-see-maintainer-reported-acceptance-scope)):
 
 1. At desktop width (1280px) and phone width (390px), use **Try generated demo**.
    Verify Original/Heatmap switching, both metrics, opacity 0/55/100 and cell hover,

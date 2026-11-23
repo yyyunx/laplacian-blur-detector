@@ -7,9 +7,10 @@ The project is an open-source image quality toolkit that others can use, integra
 and contribute to. Vehicle photos are one use case alongside document capture,
 product photography, and other image upload workflows.
 
-**Current candidate: 0.3.0a1 — Experimental, trusted local images only.**
-This is a review candidate, not a published release or Production Ready service.
-Public unauthenticated HTTP hosting is not recommended; container advisories remain.
+**Public version: [v0.3.0a1 — Experimental Pre-release](https://github.com/yyyunx/laplacian-blur-detector/releases/tag/v0.3.0a1).**
+Use trusted images in a bounded local environment only. This is not Production
+Ready; public unauthenticated HTTP hosting is not recommended. Container
+advisories, including libxml2, remain; see [security caveats](SECURITY-CAVEATS.md).
 The Python core measures
 Laplacian variance, Tenengrad, and local grid sharpness with an interactive relative
 heatmap. The benchmark can compare metrics using independent thresholds. The
@@ -23,28 +24,49 @@ tool, CLI, or API directly; accounts and manually labeled datasets are not requi
 
 ## Five-minute quick start
 
-Use Python 3.10+. For a new checkout:
+Use Python 3.10+. No repository clone is needed for the released package.
+From [GitHub Releases](https://github.com/yyyunx/laplacian-blur-detector/releases/tag/v0.3.0a1),
+download the [Wheel](https://github.com/yyyunx/laplacian-blur-detector/releases/download/v0.3.0a1/laplacian_blur_detector-0.3.0a1-py3-none-any.whl)
+and [SHA256SUMS](https://github.com/yyyunx/laplacian-blur-detector/releases/download/v0.3.0a1/SHA256SUMS)
+into a new folder. Run the commands below from that folder. Compare the printed
+Wheel hash with its line in SHA256SUMS **before installing**.
 
-```bash
-git clone https://github.com/yyyunx/laplacian-blur-detector.git
-cd laplacian-blur-detector
-# Review candidate; no v0.3.0a1 tag or published download is assumed:
-git switch --track origin/release/0.3.0a1
+### Windows PowerShell
+
+```powershell
+Get-FileHash .\laplacian_blur_detector-0.3.0a1-py3-none-any.whl -Algorithm SHA256
 python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install "./laplacian_blur_detector-0.3.0a1-py3-none-any.whl[server]"
+.\.venv\Scripts\laplacian-blur-serve.exe
 ```
 
-Activate `.venv` using the Windows/Linux steps under [Installation](#installation),
-then install and run from this checkout:
+These commands use the venv executables directly; PowerShell activation is optional.
+
+### Linux / macOS
 
 ```bash
-python -m pip install -e ".[server]"
-laplacian-blur-demo --output outputs/my-first-demo
-laplacian-blur-serve
+# Linux (on macOS use: shasum -a 256 laplacian_blur_detector-0.3.0a1-py3-none-any.whl)
+sha256sum laplacian_blur_detector-0.3.0a1-py3-none-any.whl
+python3 -m venv .venv
+./.venv/bin/python -m pip install "./laplacian_blur_detector-0.3.0a1-py3-none-any.whl[server]"
+./.venv/bin/laplacian-blur-serve
 ```
+
+Use the macOS hash command instead of `sha256sum` there. NumPy/OpenCV need
+compatible native wheels/system libraries. CI covers Windows/Ubuntu Python
+3.10/3.12/3.13; these macOS shell instructions are not a macOS/ARM certification.
+An sdist is also available on the Release page. This version is distributed on
+GitHub Releases; no PyPI publication is implied.
+
+### First try
 
 Open [the local tool](http://127.0.0.1:8000), select **Try generated demo**, then
 **Heatmap**. Switch metrics, adjust opacity, and inspect regions. Batch decisions
-remain independent. The demo command writes six synthetic stress cases, separate
+remain independent. Select **Measure quality** for brightness/exposure/resolution
+and both sharpness metrics. Stop the local server with Ctrl+C.
+
+For optional saved CLI examples, run the venv's `laplacian-blur-demo` command
+with `--output outputs/my-first-demo`. It writes six synthetic stress cases, separate
 calibration/test captures, frozen per-metric policies, original/heatmap PNGs, and
 `comparison/comparison.csv`, `comparison.json`, and `metric-comparison.svg`.
 Open the SVG to compare held-out metrics and single-pass latency. Choose a new
@@ -65,13 +87,13 @@ for the actual comparison chart, measured results, and failure cases, and the
 Synthetic labels are generation rules, not human judgments or evidence of
 real-world accuracy. No trained model or real-image accuracy improvement is claimed.
 
-Before formal release, review [release gates](docs/RELEASE_READINESS.md),
+Read the [release record and remaining limits](docs/RELEASE_READINESS.md),
 [actual resource costs](docs/PERFORMANCE.md), [integration examples](docs/INTEGRATION.md)
 and [maintainer browser acceptance](docs/BROWSER_QA.md). On 2026-11-23 the maintainer
 reported manual browser QA passed for the listed scope; this was not a Codex
-browser run. Missing browser/build/touch evidence is recorded. This remains an
-unreleased experimental candidate for trusted images in a bounded local setup,
-with unresolved container advisories. PR #1–#5 are merged; see the
+browser run. Missing browser/build/touch evidence is recorded. This is a
+published Experimental Pre-release for trusted images in a bounded local setup,
+with unresolved container advisories. PR #1–#6 are merged; see the
 [integration record](docs/INTEGRATION_PLAN.md) and
 [versioned attachment/install instructions](docs/PRERELEASE_PREPARATION.md).
 
@@ -90,11 +112,14 @@ and uploads them only when analysis is requested. HTTP uploads may use temporary
 spooled files while a request is processed; these are closed after the request.
 Browser exports and the dataset CLI write CSV only when requested.
 
-## Installation
+## Developer installation (source checkout)
 
-Use Python 3.10 or newer. From a checkout of this repository:
+For contributions or source integrations, use Python 3.10+ and clone the repository.
+Use the `v0.3.0a1` tag instead of main when you need the published source exactly.
 
 ```bash
+git clone https://github.com/yyyunx/laplacian-blur-detector.git
+cd laplacian-blur-detector
 python -m venv .venv
 ```
 

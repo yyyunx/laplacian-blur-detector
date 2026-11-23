@@ -1,10 +1,11 @@
 # Release-candidate security review
 
-Current 0.3.0a1 review status: PR #1–#5 are merged at a91b8e5; installer/OS
-and runtime-isolation fixes are integrated. The dated Phase 5 evidence below is
-historical. See [current scoped review](docs/PRERELEASE_SECURITY_REVIEW.md) for
-actual artifact counts, Debian status and candidate audit boundaries.
-
+Current status: [v0.3.0a1 Experimental Pre-release is published](https://github.com/yyyunx/laplacian-blur-detector/releases/tag/v0.3.0a1)
+from 5419d81 after PR #6 merged. Limited trusted-local risk acceptance was supplied
+by the maintainer; public production/stable use remains blocked. The Phase 5
+findings below are historical evidence, not a statement that publication is pending.
+See the [published security snapshot](docs/PRERELEASE_SECURITY_REVIEW.md) for
+actual final-main scan/audit records and limitations. No new scan in this docs PR.
 
 Scope: Phase 5, based on Phase 4 `4388749`, resource change `0825628` and QA record
 `c12103a`. The final Phase 5 Git commit/CI identifies the reviewed source. This is
@@ -59,7 +60,8 @@ not a penetration test, a security guarantee, or public-deployment approval.
 
 ## SEC-005: Unresolved container distribution and SBOM findings
 
-- Severity/status: Critical as reported by Trivy; open publication blocker.
+- Severity/status: Critical as reported by Trivy; stable/public-production use
+  remains blocked. Disclosed trusted-local Experimental risk was accepted for v0.3.0a1.
 - Evidence: first full-image report for `7223067`, Actions run 44999876825,
   contains 312 package/advisory records (149 unique IDs), including libxml2
   CVE-2026-6653. Debian's [tracker](https://security-tracker.debian.org/tracker/CVE-2026-6653)

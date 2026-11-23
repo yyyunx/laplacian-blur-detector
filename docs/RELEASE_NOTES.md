@@ -1,10 +1,12 @@
-# v0.3.0a1 — Experimental pre-release review notes
+# v0.3.0a1 — Experimental Pre-release
 
-Prepared 2026-11-23. Python package version **0.3.0a1**; intended tag
-**v0.3.0a1** is not created. PR #1–#5 are merged at a91b8e5. This separate
-version PR and its Review attachments await maintainer review/merge. No Release
-or PyPI publication. Attachment copies identify their exact source commit via
-SOURCE.json and SHA256SUMS; final assets must be rebuilt from final main.
+Published 2026-11-23: [GitHub Release](https://github.com/yyyunx/laplacian-blur-detector/releases/tag/v0.3.0a1).
+PR #6 merged; tag v0.3.0a1 points to
+`5419d810e31395d5a36d659a8bfec3176e7ffccd`. Python package version is 0.3.0a1.
+The [published release-note attachment](https://github.com/yyyunx/laplacian-blur-detector/releases/download/v0.3.0a1/RELEASE_NOTES.md),
+SOURCE.json and SHA256SUMS record the final source and checked downloads.
+This repository document may receive clarifications; the original tag and
+published attachments remain unchanged. No PyPI publication was performed.
 
 **Intended use: trusted images in a bounded local environment only.** Keep the
 experimental label and advisory/evidence limits. This is not Production Ready and
@@ -31,7 +33,7 @@ behavior remain compatible. No AI model, database or login system is introduced.
 
 ## Compatibility and operations
 
-Python 3.10+; NumPy/OpenCV core, optional HTTP dependencies. Old API keys and default
+Python 3.10+; NumPy/OpenCV core, optional HTTP dependencies. Existing API response keys and default
 Laplacian decisions are unchanged. Raw scores/thresholds are not interchangeable
 across metrics, intensity scales or preprocessing. Local/diagnostic coordinates
 follow EXIF display orientation; legacy blur preprocessing stays unchanged.
@@ -40,7 +42,7 @@ HTTP limits remain 10 MiB/file, 20MP/image, two active analyses/process, 32×32 
 maximum and 16×16 pixel minimum cells. Client abort does not kill accepted native
 work. Public-host operators must supply network controls and process budgets.
 
-## Publication gates
+## Published acceptance and known limitations
 
 Maintainer Manual Browser QA Passed was reported on 2026-11-23 for EXIF rotation,
 heatmap/metric/opacity/hover, diagnostics, 390px layout, errors and batch flow.
@@ -50,7 +52,7 @@ physical-touch and keyboard-specific evidence were not supplied; see [QA scope](
 The 2026-11-23 merged-main image report still contains 1 Critical and 65 High
 records, plus other severities; these are not counts of proven API exploit paths.
 libxml2 remains installed; reachability is not proven, not universally ruled out.
-No supported trixie fix is currently recorded in Debian's tracker. Read the
+The release's 2026-11-23 tracker recheck recorded no supported trixie fix. Read the
 [scoped security review](PRERELEASE_SECURITY_REVIEW.md) and retained
 [targeted triage](CONTAINER_TRIAGE.md); remaining findings are not suppressed.
 
@@ -59,7 +61,9 @@ The relevant code/test were unchanged between PR #4/#5; bounded single/full test
 and Windows CI subsequently passed. It remains an unreproduced environmental
 suspected issue with root cause unconfirmed, not a claimed permanent repair.
 
-Review/merge of the version PR, final-main asset rebuild, risk acceptance and
-publication approval remain open. Follow [asset preparation](PRERELEASE_PREPARATION.md),
-[release gates](RELEASE_READINESS.md) and [security caveats](../SECURITY-CAVEATS.md).
-No new algorithm, API response, CLI behavior or dependency change in this bump.
+The maintainer approved the Experimental limited-use risk and publication.
+All five published attachments were publicly downloaded and checksum-verified.
+Use the [Wheel quick start](../README.md#five-minute-quick-start),
+[release record](RELEASE_READINESS.md) and [security caveats](../SECURITY-CAVEATS.md).
+Future versions require their own approval and validation; this documentation
+change does not rebuild or replace v0.3.0a1 packages or change product behavior.

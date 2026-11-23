@@ -1,10 +1,10 @@
 # Historical Phase 5 validation record (2026-11-22)
 
-PR #1–#5 are now merged at a91b8e5 with 8/8 main CI. Current 0.3.0a1
-version/asset validation is separate and recorded in its Draft PR, source manifest
-and [pre-release procedure](PRERELEASE_PREPARATION.md). Historical evidence below
-is not relabeled as testing the new version artifacts.
-
+PR #1–#6 are merged. v0.3.0a1 was published from final main 5419d81 with
+[8/8 CI](https://github.com/yyyunx/laplacian-blur-detector/actions/runs/45107557546).
+The Release's SOURCE.json/checksums identify the rebuilt and verified artifacts;
+see the [completed release record](RELEASE_READINESS.md).
+Historical evidence below retains its original dates/scopes.
 
 This records actual evidence and explicit limits, not publication approval.
 Current acceptance update (2026-11-23): the maintainer reported manual browser QA
