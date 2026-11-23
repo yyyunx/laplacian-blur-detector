@@ -42,15 +42,16 @@ acceptance criteria before introducing new services or dependencies. Consult
 
 Use `feature/<name>`, `fix/<name>`, `docs/<name>`, `refactor/<name>`, or
 `release/<version>` for new branches. Do not use `codex/`, `ai/`, or other tool
-names as prefixes. The active hardening branch is `feature/release-readiness`.
-Some legacy review refs remain solely to keep existing draft PRs open; do not
-start new development on those refs or delete them without checking the PR chain.
+names as prefixes. Earlier feature/release branches are retained as review history;
+PR #1–#6 are merged. Do not start new development on legacy refs or delete them
+without checking current PR references and maintainer approval.
 
 1. Fork the repository and create a descriptive branch.
 2. Keep the pull request focused. Explain the resulting behavior and compatibility.
 3. Run lint and the tests relevant to your changes. Add tests for new behavior
    where they demonstrate a meaningful regression or contract.
-4. Update documentation and the Unreleased section of `CHANGELOG.md` when behavior changes.
+4. Update documentation and add an Unreleased changelog entry for future behavior
+   changes; keep published release entries historical.
 5. Open a pull request using the template and respond to review feedback.
 
 Maintainer review determines whether a change is merged. CI runs on pull requests;
@@ -78,7 +79,7 @@ Use [the security policy](SECURITY.md) for vulnerability reports.
 ## Release checklist
 
 Use the evidence/status in [Release readiness](docs/RELEASE_READINESS.md) and
-[draft notes](docs/RELEASE_NOTES.md). Passing tests does not check off pending
+[release notes](docs/RELEASE_NOTES.md). Passing tests does not check off pending
 or unreported browser substeps or operator deployment controls. Distinguish
 maintainer-reported manual QA from automation. Follow the
 [completed stacked integration record](docs/INTEGRATION_PLAN.md) and

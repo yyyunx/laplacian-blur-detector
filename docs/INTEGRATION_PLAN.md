@@ -1,6 +1,6 @@
 # Completed stacked integration record
 
-PR #1–#5 were merged with Merge Commits on 2026-11-23. Final integrated main:
+PR #1–#5 were merged with Merge Commits on 2026-11-23. The Phase 2–5 integration result was:
 `a91b8e5f0e5ffdc5baede93720a26f92144859a9`;
 [main CI 8/8 success](https://github.com/yyyunx/laplacian-blur-detector/actions/runs/45095834084).
 This is a completed record, not a request to merge those PRs again.
@@ -36,11 +36,15 @@ The old failure was retained as **unreproduced, suspected environmental issue;
 root cause unconfirmed**. No skip, arbitrary sleep or source fix was introduced.
 This does not prove a particular external lock owner or permanent resolution.
 
-## Current release work
+## Completed version release
 
-The separate release/0.3.0a1 branch changes version/release documentation only.
-Its Draft PR targets main and must be reviewed separately; no automatic merge,
-tag, Release or PyPI publication. After approval/merge, rebuild final assets from
-the resulting main SHA using [pre-release preparation](PRERELEASE_PREPARATION.md).
+PR #6 merged the version/documentation commit ff77ba1 as
+`5419d810e31395d5a36d659a8bfec3176e7ffccd`; final main CI passed 8/8.
+Its tree is 17a940a552b9e6c31dfba75daa9fea3a722bd89b. Final attachments were rebuilt
+from that Merge Commit and verified independently, then published as
+[v0.3.0a1 Experimental Pre-release](https://github.com/yyyunx/laplacian-blur-detector/releases/tag/v0.3.0a1).
+The tag points to that commit; all original branches remain. No earlier PR needs
+merging again. Post-release documentation work does not retarget the tag or alter
+published assets. [Installation and future preparation](PRERELEASE_PREPARATION.md).
 Maintainer browser acceptance remains [scoped](BROWSER_QA.md); remaining
-[container risks](PRERELEASE_SECURITY_REVIEW.md) are not erased by integration.
+[container risks](PRERELEASE_SECURITY_REVIEW.md) are not erased by publication.

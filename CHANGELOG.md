@@ -1,10 +1,12 @@
 # Changelog
 
-## 0.3.0a1 — Experimental review candidate (2026-11-23, not published)
+## 0.3.0a1 — Experimental Pre-release (2026-11-23)
 
-- Set the Hatch version source to `0.3.0a1`; prepare new wheel/sdist review assets
-  from the version commit, with source provenance and SHA256 checksums. Final
-  publication assets must be rebuilt after the version PR merges.
+- Published [v0.3.0a1](https://github.com/yyyunx/laplacian-blur-detector/releases/tag/v0.3.0a1)
+  from `5419d810e31395d5a36d659a8bfec3176e7ffccd` after PR #6 merged.
+- Set the Hatch version source to `0.3.0a1`; rebuild wheel/sdist from final main,
+  with published source provenance and SHA256 checksums. The earlier Review
+  attachments were separate validation artifacts, not the publication source.
 - Record completed Merge Commit integration of PR #1–#5 at `a91b8e5` and retain
   all 18 original work commits. No algorithm, API, CLI or dependency change.
 - Preserve the historical Windows report-directory rename failure as unreproduced

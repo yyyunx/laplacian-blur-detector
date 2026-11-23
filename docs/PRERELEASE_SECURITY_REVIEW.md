@@ -1,19 +1,21 @@
-# Scoped 0.3.0a1 security review — 2026-11-23
+# Published 0.3.0a1 security snapshot — 2026-11-23
 
-Version/documentation preparation only; no new dependency or Docker change.
-Experimental trusted-image bounded local use. **Not Production Ready; public
-unauthenticated HTTP hosting is not recommended.** Maintainer risk acceptance
-and publication approval remain separate gates.
+[v0.3.0a1 is published](https://github.com/yyyunx/laplacian-blur-detector/releases/tag/v0.3.0a1).
+The maintainer approved the disclosed Experimental trusted-image bounded-local risk.
+This is dated release evidence, not a new scan performed by the documentation PR.
+**Not Production Ready; public unauthenticated HTTP hosting is not recommended.**
+Publication does not approve stable production use or clear native advisories.
 
 ## Actual merged-image evidence
 
-Read and SHA256-verified the existing merged-main CI artifact, not a new local
-Docker scan: main a91b8e5, run 45095834084, artifact 14782344756.
-[Full report/inventory/runtime probe](https://github.com/yyyunx/laplacian-blur-detector/actions/runs/45095834084/artifacts/14782344756).
-ZIP SHA256: 3da12332e1d5b7477476cbfc4c1fc4e1432564e7c3e9bd31a59d224b89e01f50.
-Reported 2026-11-23 01:41 UTC; expires 2026-12-07 01:41 UTC. Preserve prior
-reports too; older evidence expires earlier. The version PR's normal CI will
-build and collect another full-image report; read its exact source/DB metadata.
+Final published-source main is 5419d810e31395d5a36d659a8bfec3176e7ffccd.
+Its actual CI scan is run 45107557546, artifact 14787729323:
+[full report/inventory/runtime probe](https://github.com/yyyunx/laplacian-blur-detector/actions/runs/45107557546/artifacts/14787729323).
+ZIP SHA256: 5ff2fc9e94742ad1ff702549cbeda0e62610a0d4bfbf8ae30dfcb15401f3e210.
+Reported 2026-11-23 03:43 UTC; CI retention expires 2026-12-07 03:43 UTC.
+The published [SOURCE.json](https://github.com/yyyunx/laplacian-blur-detector/releases/download/v0.3.0a1/SOURCE.json)
+retains the source/scan summary. Preserve full reports before expiry; recheck for
+future releases instead of relabeling old data as a current scan.
 
 This snapshot has **1 Critical, 65 High, 94 Medium, 113 Low, 17 Unknown** records,
 141 unique Advisory IDs. Counts are scanner records, not independent confirmed
@@ -30,7 +32,7 @@ CVE-2026-6653 has no fixed version in this image report. On 2026-11-23 the
 lists trixie affected/no-dsa and a fix in newer distributions, not a supported
 fixed trixie package. Do not mix stable/unstable packages or hide the advisory.
 Await a supported vendor update/backport or separately reviewed dependency/base
-work. No such change is slipped into this version PR.
+work. No dependency/base change is introduced by this documentation PR.
 
 Image-path reachability remains **not proven reachable**, not confirmed
 unreachable and not a confirmed exploitation path. Existing benign XMP/loader
@@ -40,20 +42,20 @@ The dependency chain and other native/vendor/build-SBOM findings remain in
 claimed. Malicious files can affect ordinary local native decoding as well as
 remote HTTP use; trusted input and isolation limit exposure, not underlying bugs.
 
-## Candidate Python/package checks
+## Recorded published-package checks
 
-New wheel/sdist clean installs will supply exact installed inventories, pip check,
-and a bounded pip-audit check with database/tool details in the candidate's Review
-evidence. That audit cannot cover OS libraries or prove absence of vulnerabilities;
-no result is implied before execution. Build tools/test-only packages are recorded
-separately from the project's runtime dependencies. No unnecessary project
-dependency is added. Inspect the actual candidate audit and CI evidence for review.
+Final-main wheel/sdist were built anew and installed in separate clean venvs;
+CLI/demo/API/version smoke and pip check passed. pip-audit 2.10.1 checked 18 runtime
+dependencies plus separately identified installer/validation pins, with no known
+advisory records or skipped entries in that check. It does not cover OS/native
+libraries, prove absence of vulnerabilities or constitute a source-code audit.
+No new scan or dependency update is performed for the documentation follow-up.
 
-Archive/path checks and targeted private-key/credential checks are performed on
-candidate contents. They do not constitute an exhaustive historical secrets audit.
-Generated examples/outputs, caches, virtual environments and local QA images must
-not ship. Current review attachments are built from committed source, not the
-working directory's unrelated files.
+Archive/Sentinel/private-path checks and Gitleaks 8.30.1 passed on the published
+source/packages. They are not an exhaustive historical secrets audit. Generated
+examples/outputs, caches, environments and private QA images were excluded.
+Published packages/notes/source manifest/checksums are on the Release page and
+remain unchanged; later repository documentation corrections do not replace them.
 
 Remaining controls: no built-in HTTP auth/rate/connection limits, no hard native
 deadline, multi-process slot multiplication and CLI/library lacking HTTP guards.
